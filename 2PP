@@ -1,0 +1,336 @@
+
+
+// See: https://mlxxxp.github.io/documents/Arduino/libraries/Arduboy2/Doxygen/html/
+/*
+************** Trace ********* by Cédric Martin, inspired by the movie TRON (and my brother's game)
+written 22Feb2020
+
+one Controls definition must be in comment. switch them when you switch from emulator to real Arduboy
+the purpose is when you play with a keyboard, the "arroys" player is on the right but not if you play on Arduboy
+
+
+
+*/
+
+#include <Arduboy2.h>
+ Arduboy2 arduboy;
+
+/*
+  //Controls designed for Arduboy
+  #define P1_LEFT UP_BUTTON
+  #define P1_RIGHT DOWN_BUTTON
+  #define P2_RIGHT B_BUTTON
+  #define P2_LEFT A_BUTTON
+*/
+  //Controls designed for Emulator
+  #define P2_LEFT DOWN_BUTTON
+  #define P2_RIGHT UP_BUTTON
+  #define P1_LEFT A_BUTTON
+  #define P1_RIGHT B_BUTTON
+
+#define waitBetweenRound 2000
+#define LEFT_TURN 1
+#define RIGHT_TURN 2
+
+#define TRACE 0
+#define REFLX 1
+#define MEMO 2
+
+class Player { //to know if a pixel can hurt or not
+  public :
+    int x,y;
+    char dir;  //0 Up, 1 right, 2 Down and 3 left
+    char turned;
+    int score;
+    Player (int x, int y, char dir);
+};
+Player::Player(int x, int y, char dir){
+  this->x=x;
+  this->y=y;
+  this->dir=dir;
+  this->turned=0;
+  this->score=0;
+}
+
+Player p1=Player(10,30,1);
+Player p2=Player(118,30,3);
+char game=0;
+char c=0;
+bool blink=true;
+char symbolArray [66]={(char)38,(char)38 ,(char)155,(char)155,(char)156,(char)156,(char)157,(char)157,(char)168,(char)168,(char)37,
+                      (char)225,(char)225,(char)174,(char)174,(char)175,(char)175,(char)206,(char)206,(char)232,(char)232,(char)228,
+                      (char)64,(char)64,(char)35,(char)35,(char)236,(char)236,(char)20,(char)20,(char)25,(char)25,(char)228,
+                      (char)247,(char)247,(char)4,(char)4,(char)18,(char)18,(char)2,(char)2,(char)3,(char)3,(char)37,
+                      (char)36,(char)36,(char)5,(char)5,(char)24,(char)24,(char)234,(char)234,(char)197,(char)197,(char)237,
+                      (char)10,(char)10,(char)240,(char)240,(char)12,(char)12,(char)15,(char)15,(char)14,(char)14,(char)237};
+
+void shuffle (int size){
+  char ch=0;
+  int r1,r2=0;
+  randomSeed(size*12);
+  for (int i=0; i<200; i++){
+    r1=random(size);
+    r2=random(size);
+    ch=symbolArray[r1];
+    symbolArray[r1]=symbolArray[r2];
+    symbolArray[r2]=ch;
+  }
+}  
+int getIndice(int x, int y, bool fill){ //(don't know the english word) Translate the cursor coordinate by an "indice" of the SymbolArray)
+  arduboy.fillRect(x+1,y+1,7,10,fill);
+  int temp=(x-28)/8;
+  temp+=(y+1);//  divided by 11 multiplied by 11 (coincidence)
+  return temp;
+}
+void turnUpdate(void){
+  if (p1.dir<2){
+    arduboy.setCursor(1,6);
+    arduboy.print("P1's");
+    arduboy.setCursor(1,14);
+    arduboy.print("turn");
+  }
+  arduboy.setCursor(1,23);
+  arduboy.print(p1.score);
+  arduboy.setCursor(1,50);
+  arduboy.print(p2.score);
+}
+void newGame(void){
+  arduboy.clear();
+  arduboy.setCursor(40,30);
+  arduboy.print(p1.score);
+  arduboy.print(" - ");
+  arduboy.print(p2.score);
+  arduboy.display();
+  delay(waitBetweenRound);
+  arduboy.clear();
+  p1.x=10;
+  p1.y=30;
+  p1.dir=1;
+  p2.x=118;
+  p2.y=30;
+  p2.dir=3;
+  arduboy.drawRect(0,0,128,64,1);
+}
+ 
+void setup() { // ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+  arduboy.begin();
+  arduboy.clear();
+  //to do : Add menu for game selection
+  //game=TRACE;
+  //game=REFLX;
+  game=MEMO;
+  
+  if (TRACE==game){
+    arduboy.setFrameRate(30);
+    arduboy.drawRect(0,0,128,64,1);
+    arduboy.drawPixel(p1.x,p1.y,1);
+    arduboy.drawPixel(p2.x,p2.y,1);
+  }
+  else if (MEMO==game){
+    arduboy.setFrameRate(5);
+    p1.x=28;
+    p1.y=-1;
+    p1.dir=0;
+    //28+9*j,10*i-1
+    int it=0;
+    shuffle(66);
+    for (int i=0; i<6; i++){
+      for (int j=0; j<11;j++){
+        //(char)178 card cover symbolArray[it++]
+        arduboy.drawChar(30+j*8,i*11+1,(char)178,1,0,1);  
+        arduboy.drawRect(29+j*8,i*11,7,10,1);
+      }
+    }
+    turnUpdate();
+  }
+}
+
+void loop() {
+  if (TRACE==game){
+    if (arduboy.pressed(P1_LEFT)){
+      if (!p1.turned){
+        p1.turned= LEFT_TURN ;
+        p1.dir--;
+        if (p1.dir<0){
+          p1.dir=3;
+        }
+      }
+    }
+    if (arduboy.pressed(P1_RIGHT)){
+      if (!p1.turned){
+        p1.turned=RIGHT_TURN;
+        p1.dir++;
+        if (p1.dir>3){
+          p1.dir=0;
+        }
+      }
+    }
+    if (arduboy.pressed(P2_LEFT)){
+      if (!p2.turned){
+        p2.turned=LEFT_TURN;
+        p2.dir--;
+        if (p2.dir<0){
+          p2.dir=3;
+        }
+      }
+    }
+    if (arduboy.pressed(P2_RIGHT)){
+      if (!p2.turned){
+        p2.turned=RIGHT_TURN;
+        p2.dir++;
+        if (p2.dir>3){
+          p2.dir=0;
+        }
+      }
+    }
+  }
+  else if (MEMO==game){
+    if (arduboy.pressed(UP_BUTTON)){
+      if (!p1.turned){
+        p1.turned= UP_BUTTON ;
+        if (p1.y>0){
+          arduboy.drawRect(p1.x,p1.y,9,12,0);
+          p1.y-=11;
+        }
+      }
+    }
+    if (arduboy.pressed(DOWN_BUTTON)){
+      if (!p1.turned){
+        p1.turned= DOWN_BUTTON ;
+        if (p1.y<50){ //?
+          arduboy.drawRect(p1.x,p1.y,9,12,0);
+          p1.y+=11;
+        }
+      }
+    }
+    if (arduboy.pressed(RIGHT_BUTTON)){
+      if (!p1.turned){
+        p1.turned= RIGHT_BUTTON ;
+        if (p1.x<105){
+          arduboy.drawRect(p1.x,p1.y,9,12,0);
+          p1.x+=8;
+        }
+      }
+    }
+    if (arduboy.pressed(LEFT_BUTTON)){
+      if (!p1.turned){
+        p1.turned= UP_BUTTON ;
+        if (p1.x>30){
+          arduboy.drawRect(p1.x,p1.y,9,12,0);
+          p1.x-=8;
+        }
+      }
+    }
+    if (arduboy.pressed(A_BUTTON)){
+      if (!p1.turned){
+        p1.turned= A_BUTTON ;
+        if (0==p1.dir){
+          p2.dir=symbolArray[getIndice(p1.x,p1.y,0 )];
+          p2.x=p1.x;
+          p2.y=p1.y;
+          arduboy.drawChar(p1.x+2,p1.y+2,p2.dir,1,0,1);
+          p1.dir++;
+        }
+        else if (1==p1.dir){
+          p2.dir=symbolArray[getIndice(p1.x,p1.y,0)];
+          arduboy.drawChar(p1.x+2,p1.y+2,p2.dir,1,0,1);
+          //p1.dir++;
+        }
+      }
+    }
+  }  
+  
+  if (!(arduboy.nextFrame()))
+    return;
+    
+  // button check to do eventually : only check "pressed" once then mask the result
+  if (arduboy.notPressed(P2_RIGHT)&&(p2.turned==RIGHT_TURN)){
+    p2.turned=0;
+  }
+  if (arduboy.notPressed(P1_LEFT)&&(p1.turned==LEFT_TURN)){
+    p1.turned=0;
+  }
+  if (arduboy.notPressed(P2_LEFT)&&(p2.turned==LEFT_TURN)){
+    p2.turned=0;
+  }
+  if (arduboy.notPressed(P1_RIGHT)&&(p1.turned==RIGHT_TURN)){
+    p1.turned=0;
+  }  
+  //if (0==arduboy.getInput()){
+  //temporaire...
+  if(true){  
+    p1.turned=0;
+  }
+
+  if (game==TRACE)
+  {
+      switch(p1.dir){   //player 1 moves
+        case 0:
+          p1.y--;
+        break;
+        case 1:
+          p1.x++;
+        break;
+        case 2:
+          p1.y++;
+        break;
+        case 3:
+          p1.x--;
+        break;
+      }
+      switch(p2.dir){   //player 2 moves
+        case 0:
+          p2.y--;
+        break;
+        case 1:
+          p2.x++;
+        break;
+        case 2:
+          p2.y++;
+        break;
+        case 3:
+          p2.x--;
+        break;
+      }
+      
+      if((p1.x==p2.x)&&(p1.y==p2.y)){ //draw
+        p1.score++;
+        p2.score++;
+        newGame();
+      }
+      
+      if(arduboy.getPixel(p1.x,p1.y)){
+        //arduboy.print("BLAM!");  //for now...
+        p2.score++;
+        newGame();
+      }
+      if(arduboy.getPixel(p2.x,p2.y)){
+        //arduboy.print("BIM!");  //for now...
+        p1.score++;
+        newGame();
+      }
+      
+      arduboy.drawPixel(p1.x,p1.y,1);
+      arduboy.drawPixel(p2.x,p2.y,1);
+  }
+  else if (game==REFLX)
+  {
+    arduboy.drawChar(50,random(60),c++,1,0,1);
+    arduboy.setCursor(0,0);
+    arduboy.print((int)c);
+    delay(300);
+    while (arduboy.pressed(A_BUTTON)!=0);
+  }
+  else if (game==MEMO)
+  {
+    arduboy.drawRect(p1.x,p1.y,9,12,blink);
+    if (blink)
+      blink=false;
+    else
+      blink=true;
+    //arduboy.setCursor(4,40);
+    //arduboy.print(getIndice(p1.x,p1.y));  
+    //arduboy.print("  )");
+  }  
+  arduboy.display();
+}
