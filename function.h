@@ -2,6 +2,7 @@
 #define function_h
 
 //#include <Arduino.h>
+#include "globals.h"
 
 int getIndice(int x, int y){ //TO DO
   //arduboy.fillRect(x+1,y+1,7,10,fill);
@@ -11,7 +12,7 @@ int getIndice(int x, int y){ //TO DO
   return temp;
 }
 
-
+/*
 int drawStone(int i, bool color){ //black 0 white 1
   int x=(i%casesCol)*casesLength+leftBorder;
   int y=(i/casesCol)*casesHeight+upBorder;
@@ -42,25 +43,26 @@ void drawStones(void){
     }
   }
 }
+*/
 void SelectorManagment(void){
     if (arduboy.justPressed(UP_BUTTON)){
-      if (p1.y>=upBorder+casesHeight){
-        p1.y-=casesHeight;
+      if (cursY>=upBorder+casesHeight){
+        cursY-=casesHeight;
       }
     }
     if (arduboy.justPressed(DOWN_BUTTON)){
-      if (p1.y<(upBorder+(casesRow-1)*casesHeight)){ 
-        p1.y+=casesHeight;
+      if (cursY<(upBorder+(casesRow-1)*casesHeight)){ 
+        cursY+=casesHeight;
       }
     }
     if (arduboy.justPressed(RIGHT_BUTTON)){
-      if (p1.x<(leftBorder+(casesCol-1)*casesLength)){
-        p1.x+=casesLength;
+      if (cursX<(leftBorder+(casesCol-1)*casesLength)){
+        cursX+=casesLength;
       }
     }
     if (arduboy.justPressed(LEFT_BUTTON)){
-      if (p1.x>=(leftBorder+casesLength)){
-        p1.x-=casesLength;
+      if (cursX>=(leftBorder+casesLength)){
+        cursX-=casesLength;
       }
     }
 }
@@ -70,16 +72,27 @@ void drawSelector(int i){
     blinkTimer=BLINK_TIMER_INIT;
     blink=!blink;
   }  
-  int x=(i%casesCol)*casesLength+leftBorder;
-  int y=(i/casesCol)*casesHeight+upBorder;
-  x+=adjSelectX;
-  y+=adjSelectY;
+  int x=(i%casesCol)*casesLength+leftBorder+4;
+  int y=(i/casesCol)*casesHeight+upBorder+4;
+  //x+=adjSelectX;
+  //y+=adjSelectY;
   arduboy.drawLine(x-4,y-4,x-2,y-2,blink? 1:0);  // Why not add a variable to adjust the Selector for each game? todo?
   arduboy.drawLine(x-4,y+4,x-2,y+2,blink? 1:0);
   arduboy.drawLine(x+2,y+2,x+4,y+4,blink? 1:0);
   arduboy.drawLine(x+2,y-2,x+4,y-4,blink? 1:0);
 }
-  
+
+void inGameMenu(){
+  int x=p1Playing? (leftBorder-42):(leftBorder+80);
+  arduboy.fillRect(x ,0,31,64,0);
+  arduboy.setCursor(x,10);
+  arduboy.print(F("Walls"));
+  arduboy.setCursor(x,30);
+  arduboy.print(F("Robot"));
+  arduboy.setCursor(x,50);
+  arduboy.print(F("EoT"));
+}
+/*
 void turnUpdate(void){ /////////////////////////////////////// score ///////////////////////  score ///////////////////////
   if (1==difficulty) { // for MEMO that have bigger cards in difficulty 1
     arduboy.fillRect(0,0,17,64,0);
@@ -121,5 +134,5 @@ void turnUpdate(void){ /////////////////////////////////////// score ///////////
     arduboy.drawCircle(22,27,3,1); // to picture the remaining (or placed) stones
     arduboy.fillCircle(22,60,3,1);
   }
-}
+}*/
 #endif

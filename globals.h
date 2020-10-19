@@ -46,15 +46,19 @@ uint8_t casesCol=7+difficulty;
 uint8_t casesRow=2+difficulty;
 int leftBorder=30;
 int upBorder=-1;
-int adjSelectX=0;
-int adjSelectY=0;
-uint8_t stoneArray [81];
+//int adjSelectX=0; //no more other games... todo: clean
+//int adjSelectY=0;
+
+int cursX=50;
+int cursY=8;
+
+//uint8_t stoneArray [81];
 
 
 class Player {
   public :
     int x,y;
-    int length;
+    uint8_t weapon;
     uint8_t dir;
     int score;
     Player(int X, int Y);
@@ -63,12 +67,12 @@ Player::Player(int X, int Y)
 {
   this->x=X;
   this->y=Y;
-  this->length=14;  //becomes "Number of Stones left" in MILL //becomes ...Weapon? in Maze
-  this->dir=0;      // in Maze, direction is managed otherwise
+  this->weapon=0;  //becomes "Number of Stones left" in MILL //becomes ...Weapon? in Maze
+  this->dir=0;      
   this->score=0;
 }
 
-class Player p1(4,0);
-class Player p2(122,20);
+class Player p1(4,30);
+class Player p2(132,30);
 
 #endif

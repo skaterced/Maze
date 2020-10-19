@@ -6,7 +6,7 @@
 #include "globals.h"
 #include "function.h"
 
-#define WOB 1 //White on Black
+#define WOB 0 //1 for White on Black
 #define WALL_UP 0x80
 #define WALL_RIGHT 0x40
 #define WALL_DOWN 0x20
@@ -35,8 +35,6 @@ const unsigned char robots[] PROGMEM = {
 0xff,0xff,0x81,0xdd,0x9d,0xd5,0x81,0xff,
 0xff,0xff,0x81,0x9d,0xdd,0x9d,0x81,0xff};
 
-int cursX=50;
-int cursY=8;
 uint8_t timeUnit=5;
 
 class Tile {
@@ -99,10 +97,7 @@ Tile tiles[NBTILES];
               Tile(22,0xD0),Tile(23,0),Tile(24,0x50),Tile(25,0),Tile(26,0xA0),Tile(27,0),Tile(28,0x30),
               Tile(29,0xD0),Tile(30,0),Tile(31,0x50),Tile(32,0),Tile(33,0x40),Tile(34,0),Tile(35,0x10),};*/
 
-void Robot_Affiche(bool p1_){
-  //int frame= p1_? 0:BETWEEN_ROBOTS; //24142
-  //Sprites::drawOverwrite(p1_? p1.x:p2.x ,p1_? p1.y:p2.y ,robots, frame+p1_? p1.dir:p2.dir );
-  //23454
+void Robot_Affiche(bool p1_){  //why not in player now that there are no other games...
   int frame=0;
   if (p1_)
     Sprites::drawOverwrite(p1.x, p1.y, robots, frame+p1.dir);
@@ -141,7 +136,7 @@ int voisin(uint8_t ind, uint8_t direction){  //Yes, I switched back to french. I
       else {
         return (findInd(ind+casesCol));
       }
-    break;
+    break; 
     case (GAUCHE):
       if (0==(ind%casesCol))
         return (-1);
@@ -150,6 +145,7 @@ int voisin(uint8_t ind, uint8_t direction){  //Yes, I switched back to french. I
       }
     break;
   }
+  return -1;
 }
 
 void randomTiles (uint8_t randWall, bool sym, bool border){
@@ -234,27 +230,29 @@ void imposeWall(uint8_t ind, bool addAndRemove){
 }
 
 void mazeSetup(void){
-  p1.x=42;
-  p1.y=18;
-  p2.x=102;
-  p2.y=18;
+  p1.x=32;
+  p1.y=34;
+  p2.x=114;
+  p2.y=34;
   casesCol=7;
   casesRow=6;
   casesHeight=10;
   casesLength=10;
   leftBorder=42;
   upBorder=2;
-  adjSelectX=4;
-  adjSelectY=4;
-  randomTiles(25, SYMETRIC, true ); //sym //border
+  //adjSelectX=4;
+  //adjSelectY=4;
+  randomTiles(30, SYMETRIC, true ); //sym //border
   for (int i=0;i<NBTILES;i++){
     imposeWall(i, false);
   }  
 }
 
 void playMaze(){
+  if (0==WOB)
+    arduboy.fillRect(0,0,128,64,1);
   if ((arduboy.justPressed(A_BUTTON))||(arduboy.justPressed(B_BUTTON))){    
-    uint8_t temp=getIndice(p1.x,p1.y);
+    uint8_t temp=getIndice(cursX,cursY);
     tiles[findInd(temp)].turn(arduboy.justPressed(A_BUTTON));
     imposeWall(temp, true);
   }
@@ -264,13 +262,14 @@ void playMaze(){
 //      break;
   }
   SelectorManagment();
-  drawSelector(getIndice(p1.x, p1.y));
+  drawSelector(getIndice(cursX,cursY));
   Robot_Affiche(true);
   Robot_Affiche(false);
   
     //test
   //p1.score=getIndice(p1.x, p1.y);
   //p2.score=tiles[findInd(getIndice(p1.x, p1.y))].walls;
-  turnUpdate();
+  //turnUpdate();
+  inGameMenu();
 }
 #endif
