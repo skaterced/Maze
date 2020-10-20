@@ -82,8 +82,31 @@ void drawSelector(int i){
   arduboy.drawLine(x+2,y-2,x+4,y-4,blink? 1:0);
 }
 
+void moveRobot(bool player1){
+  uint8_t dir=99;
+  if (arduboy.justPressed(UP_BUTTON)){
+    dir=HAUT;
+  }
+  if (arduboy.justPressed(DOWN_BUTTON)){
+    dir=BAS;
+  }
+  if (arduboy.justPressed(RIGHT_BUTTON)){
+    dir=DROITE;
+  }
+  if (arduboy.justPressed(LEFT_BUTTON)){
+    dir=GAUCHE;
+  }
+  if (99!=dir){
+    if (player1)
+      p1.move(dir);
+    else
+      p2.move(dir);
+  }
+}
+
 void inGameMenu(){
-  int x=p1Playing? (leftBorder-42):(leftBorder+80);
+  //int x=p1Playing? (leftBorder-42):(leftBorder+80);
+  int x=p1Playing? 0:100;
   arduboy.fillRect(x ,0,31,64,0);
   arduboy.setCursor(x,10);
   arduboy.print(F("Walls"));

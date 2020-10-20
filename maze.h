@@ -11,31 +11,12 @@
 #define WALL_RIGHT 0x40
 #define WALL_DOWN 0x20
 #define WALL_LEFT 0x10
-#define HAUT 3
-#define DROITE 2
-#define BAS 1
-#define GAUCHE 0
-#define SYMETRIC true
-#define BETWEEN_ROBOTS 4 //Frame difference between Robot1 & Robot2
 
+#define SYMETRIC true
 #define NBTILES 42//casesCol*casesRow
 
-const unsigned char robots[] PROGMEM = {
-// width, height,
-8, 8,
-// BoW? (not intended)
-//R_1_0-3
-0xff,0xff,0x83,0xd5,0xd6,0x9d,0x83,0xff,
-0xff,0xff,0x83,0xd5,0x96,0xd5,0x83,0xff,
-0xff,0xff,0x83,0x9d,0xd6,0xd5,0x83,0xff,
-0xff,0xff,0x83,0xdd,0x9e,0xdd,0x83,0xff,
-//R_2_0-3
-0xff,0xff,0x81,0xd5,0x9d,0xdd,0x81,0xff,
-0xff,0xff,0x81,0x9d,0xd5,0x9d,0x81,0xff,
-0xff,0xff,0x81,0xdd,0x9d,0xd5,0x81,0xff,
-0xff,0xff,0x81,0x9d,0xdd,0x9d,0x81,0xff};
-
 uint8_t timeUnit=5;
+uint8_t test=0;
 
 class Tile {
   public:
@@ -96,15 +77,6 @@ Tile tiles[NBTILES];
               Tile(15,0xD0),Tile(16,0),Tile(17,0x50),Tile(18,0),Tile(19,0xA0),Tile(20,0),Tile(21,0x30),
               Tile(22,0xD0),Tile(23,0),Tile(24,0x50),Tile(25,0),Tile(26,0xA0),Tile(27,0),Tile(28,0x30),
               Tile(29,0xD0),Tile(30,0),Tile(31,0x50),Tile(32,0),Tile(33,0x40),Tile(34,0),Tile(35,0x10),};*/
-
-void Robot_Affiche(bool p1_){  //why not in player now that there are no other games...
-  int frame=0;
-  if (p1_)
-    Sprites::drawOverwrite(p1.x, p1.y, robots, frame+p1.dir);
-  else
-    Sprites::drawOverwrite(p2.x,p2.y , robots, frame+BETWEEN_ROBOTS+p2.dir );
-}
-
 
 int findInd(uint8_t ind){ //return the indice (in the tiles array) that is on the given grid indice
   for (int i=0; i<casesCol*casesRow; i++){
@@ -230,15 +202,15 @@ void imposeWall(uint8_t ind, bool addAndRemove){
 }
 
 void mazeSetup(void){
-  p1.x=32;
-  p1.y=34;
-  p2.x=114;
-  p2.y=34;
+  p1.x=-9;
+  p1.y=31;
+  p2.x=71;
+  p2.y=31;
   casesCol=7;
   casesRow=6;
   casesHeight=10;
   casesLength=10;
-  leftBorder=42;
+  leftBorder=48;
   upBorder=2;
   //adjSelectX=4;
   //adjSelectY=4;
@@ -249,8 +221,9 @@ void mazeSetup(void){
 }
 
 void playMaze(){
+  inGameMenu();
   if (0==WOB)
-    arduboy.fillRect(0,0,128,64,1);
+    arduboy.fillRect(leftBorder-10,0,88,64,1);
   if ((arduboy.justPressed(A_BUTTON))||(arduboy.justPressed(B_BUTTON))){    
     uint8_t temp=getIndice(cursX,cursY);
     tiles[findInd(temp)].turn(arduboy.justPressed(A_BUTTON));
@@ -261,15 +234,22 @@ void playMaze(){
 //    if (LAST_TILE==i)
 //      break;
   }
-  SelectorManagment();
-  drawSelector(getIndice(cursX,cursY));
-  Robot_Affiche(true);
-  Robot_Affiche(false);
-  
+  //SelectorManagment();
+  //drawSelector(getIndice(cursX,cursY));
+  moveRobot(p1Playing);//p1
+  p1.draw(true, WOB);
+  p2.draw(false, WOB);
     //test
+  if (arduboy.justPressed(A_BUTTON)){
+    test++;
+  }
+  if (arduboy.justPressed(B_BUTTON)){
+    p1Playing=!p1Playing;
+  }  
+  //Sprites::drawOverwrite(4, 50, robots, test);
   //p1.score=getIndice(p1.x, p1.y);
   //p2.score=tiles[findInd(getIndice(p1.x, p1.y))].walls;
   //turnUpdate();
-  inGameMenu();
+  
 }
 #endif

@@ -6,6 +6,7 @@
 
 Arduboy2 arduboy;
 
+//todo clean those define
 #define MENU 0
 #define MENU2 1
 #define PONG 2
@@ -17,10 +18,16 @@ Arduboy2 arduboy;
 #define CHESS 8
 #define REFLX 9
 
-#define BLINK_TIMER_INIT 10
-#define BLACK_STONE 1 // (P1)
-#define WHITE_STONE 2 // (P2)
+#define HAUT 3
+#define DROITE 2
+#define BAS 1
+#define GAUCHE 0
 
+#define BLINK_TIMER_INIT 5
+//#define BLACK_STONE 1 // (P1)
+//#define WHITE_STONE 2 // (P2)
+
+#define BETWEEN_ROBOTS 8 //Frame difference between Robot1 & Robot2
 
   //Controls designed for Arduboy
 bool forEmulator = false;  // ToDo : remove this and change Menu. No more need for this bool
@@ -54,6 +61,33 @@ int cursY=8;
 
 //uint8_t stoneArray [81];
 
+const unsigned char robots[] PROGMEM = {
+// width, height,
+8, 8,
+//WoB
+//R1_0-3
+0x00,0x00,0x7c,0x2a,0x29,0x62,0x7c,0x00,
+0x00,0x00,0x7c,0x2a,0x69,0x2a,0x7c,0x00,
+0x00,0x00,0x7c,0x62,0x29,0x2a,0x7c,0x00,
+0x00,0x00,0x7c,0x22,0x61,0x22,0x7c,0x00,
+// BoW
+//R_1_0-3
+0xff,0xff,0x83,0xd5,0xd6,0x9d,0x83,0xff,
+0xff,0xff,0x83,0xd5,0x96,0xd5,0x83,0xff,
+0xff,0xff,0x83,0x9d,0xd6,0xd5,0x83,0xff,
+0xff,0xff,0x83,0xdd,0x9e,0xdd,0x83,0xff,
+//WoB
+//R2_0-3
+0x00,0x00,0x7e,0x2a,0x62,0x22,0x7e,0x00,
+0x00,0x00,0x7e,0x62,0x2a,0x62,0x7e,0x00,
+0x00,0x00,0x7e,0x22,0x62,0x2a,0x7e,0x00,
+0x00,0x00,0x7e,0x62,0x22,0x62,0x7e,0x00,
+//R_2_0-3
+0xff,0xff,0x81,0xd5,0x9d,0xdd,0x81,0xff,
+0xff,0xff,0x81,0x9d,0xd5,0x9d,0x81,0xff,
+0xff,0xff,0x81,0xdd,0x9d,0xd5,0x81,0xff,
+0xff,0xff,0x81,0x9d,0xdd,0x9d,0x81,0xff};
+
 
 class Player {
   public :
@@ -61,17 +95,51 @@ class Player {
     uint8_t weapon;
     uint8_t dir;
     int score;
-    Player(int X, int Y);
+    Player(int X, int Y) {
+      this->x=X;
+      this->y=Y;
+      this->weapon=0;  //
+      this->dir=0;      
+      this->score=0;
+    }
+    draw(bool player1, bool WhiteOnBlack){
+      int frame=WhiteOnBlack? 0:4;
+      frame+=dir;
+      if (!player1){
+        frame+=BETWEEN_ROBOTS;
+      }
+      Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, frame);
+    }
+    move(uint8_t direction){
+      dir=direction;
+      switch (dir){
+        case HAUT:
+          if (y>=casesHeight)
+            y-=casesHeight;
+        break;
+        case BAS:
+          if (y<((casesRow-1)*casesHeight))
+            y+=casesHeight;
+        break;
+        case DROITE:
+          if (x<((casesCol-1)*casesLength))
+            x+=casesLength;
+        break;
+       case GAUCHE:
+          if (x>=(casesLength))
+            x-=casesLength;
+        break;
+      }
+    }
 };
-Player::Player(int X, int Y)
-{
-  this->x=X;
-  this->y=Y;
-  this->weapon=0;  //becomes "Number of Stones left" in MILL //becomes ...Weapon? in Maze
-  this->dir=0;      
-  this->score=0;
+/*void Robot_Affiche(bool p1_){  //why not in player now that there are no other games...
+  int frame=0;
+  if (p1_)
+    Sprites::drawOverwrite(p1.x, p1.y, robots, frame+p1.dir);
+  else
+    Sprites::drawOverwrite(p2.x,p2.y , robots, frame+BETWEEN_ROBOTS+p2.dir );
 }
-
+*/
 class Player p1(4,30);
 class Player p2(132,30);
 
