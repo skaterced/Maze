@@ -72,86 +72,61 @@ const unsigned char PROGMEM picture[] =
 //char c=0;
 
 void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+  arduboy.begin();
   arduboy.clear();
-  if (0==game){
-    arduboy.begin();
-    arduboy.setFrameRate(60);
-  }
-
-  #ifdef pong_h
-    else if (PONG==game){
-      arduboy.setFrameRate(30+difficulty*5);
-      p1.x=4;
-      p1.y=20;
-      p2.x=122;
-      p2.y=20;
-    }
-  #endif
+  arduboy.setFrameRate(60);
   
-  #ifdef trace_h
-    else if (TRACE==game){
-      arduboy.setFrameRate(TRACE_FPS+difficulty*5);
-      newTraceGame();
-    }
-  #endif
-  
-  #ifdef reflx_h
-    else if (REFLX==game){
-      newReflXGame();
-    }
-  #endif
+  /*cursX=-9;
+  cursY=31;
+  p2.x=71;
+  p2.y=31;*/
+  casesCol=7;
+  casesRow=6;
+  casesHeight=10;
+  casesLength=10;
+  //leftBorder=LEFTBORDERP1;
+  //upBorder=2;
+  //adjSelectX=4;
+  //adjSelectY=4;
+  randomTiles(20, SYMETRIC, true ); //sym //border
+  for (int i=0;i<NBTILES;i++){
+    imposeWall(i, false);
+  }  
 
-  #ifdef memo_h
-    else if (MEMO==game){
-      memoSetup();
-    }
-  #endif
-  
-  #ifdef mill_h
-    else if (MILL==game){
-      millSetup();
-    }
-  #endif
-
-  #ifdef go_h
-    else if (GO==game){
-      goSetup();
-    }
-  #endif
-
-  #ifdef chess_h
-    else if (CHESS==game){
-      chessSetup();
-    }
-  #endif
-  
-  #ifdef maze_h
-    else if (MAZE==game){
-      mazeSetup();
-    }
-  #endif  
 }
- 
+
 void loop() { // -------------------------  Init loop -------------------------------------------------------------------------
   //testP++; //for .h testing (doesn't work )
   //timer++;
   //arduboy.pollButtons();  
- 
+  
+  arduboy.clear(); 
   if (!(arduboy.nextFrame()))
     return;
     
   arduboy.pollButtons();    
     
-  //if ((MENU==game)||(MENU2==game)||(PONG==game)||(MILL==game)||(GO==game)){ //in other words: IF NOT MEMO
-  if (MEMO!=game){
-    arduboy.clear(); 
-  }
-  if (MENU==game){  
+  if (MENU==game){ 
+    arduboy.drawChar(1,1,82,1,0,3);
+    arduboy.drawChar(17,1,79,1,0,3);
+    arduboy.drawChar(33,1,66,1,0,3);
+    arduboy.drawChar(49,1,79,1,0,3);
+    arduboy.drawChar(65,1,84,1,0,3);
+    
+    arduboy.drawChar(66,24,77,1,0,3);
+    arduboy.drawChar(82,24,65,1,0,3);
+    arduboy.drawChar(98,24,90,1,0,3);
+    arduboy.drawChar(114,24,69,1,0,3);
+    
+    arduboy.setCursor(10,55);
+    arduboy.print("  <-  Start ->");
+    
+  /*
     timer++;
     arduboy.drawBitmap(0,0,picture,128,48,WHITE);
     //arduboy.drawChar(2,50,17,1,0,1);
     arduboy.setCursor(10,49);
-    switch(p1.x){
+    switch(cursX){
       case (PONG):
         arduboy.print("      Pong  ->");
       break;
@@ -159,7 +134,7 @@ void loop() { // -------------------------  Init loop --------------------------
         arduboy.print("  <-  Trace ->");
       break;
       case (MAZE):
-        arduboy.print("  <-  Maze ->");
+        arduboy.print("  <-  Start ->");
       break;
       case (MEMO):
         arduboy.print("  <-  Memo  ->");
@@ -185,16 +160,17 @@ void loop() { // -------------------------  Init loop --------------------------
   
     if (arduboy.justPressed(RIGHT_BUTTON))
     {
-      if (p1.x<NBGAMES+1){
-        p1.x++;
+      if (cursX<NBGAMES+1){
+        cursX++;
       }
     }
     if (arduboy.justPressed(LEFT_BUTTON))
     {
-      if (p1.x>2){
-        p1.x--;
+      if (cursX>2){
+        cursX--;
       }
     }
+    */
     if (arduboy.justPressed(B_BUTTON))
     {
       game=MENU2;
@@ -204,9 +180,12 @@ void loop() { // -------------------------  Init loop --------------------------
     {
       arduboy.initRandomSeed();
       randomSeed(timer*37);
-      game=p1.x;
-      setup();
-    }  
+      game=cursX;
+      if (MAZE==game){
+        cursX=50;
+        cursY=8;
+      }      
+    }
   }
   else if (MENU2==game){  
     timer++;
@@ -221,24 +200,24 @@ void loop() { // -------------------------  Init loop --------------------------
     arduboy.setCursor(1,40);
     arduboy.print("A: Change    B: Back");
     
-    arduboy.drawChar(0,p1.y*10+10,16,1,0,1);
+    arduboy.drawChar(0,cursY*10+10,16,1,0,1);
  
   
     if (arduboy.justPressed(DOWN_BUTTON))
     {
-      if (p1.y<1){
-        p1.y++;
+      if (cursY<1){
+        cursY++;
       }
     }
     if (arduboy.justPressed(UP_BUTTON))
     {
-      if (p1.y>0){
-        p1.y--;
+      if (cursY>0){
+        cursY--;
       }
     }
     if (arduboy.justPressed(A_BUTTON))
     {
-      switch (p1.y){
+      switch (cursY){
         case 0:
         
           if (++difficulty==5)

@@ -12,38 +12,6 @@ int getIndice(int x, int y){ //TO DO
   return temp;
 }
 
-/*
-int drawStone(int i, bool color){ //black 0 white 1
-  int x=(i%casesCol)*casesLength+leftBorder;
-  int y=(i/casesCol)*casesHeight+upBorder;
-  arduboy.fillCircle(x,y,3,0);
-  if (color){
-    arduboy.fillCircle(x,y,2,1);
-  }
-}
-void drawStones(void){
-  for (int i=0; i<81; i++){
-    if (i==selectedI){
-      if (blink) {
-        if (BLACK_STONE==stoneArray[i]){
-          drawStone(i,0);
-        }
-        else if (WHITE_STONE==stoneArray[i]){
-          drawStone(i,1);
-        }
-      }
-    }
-    else {
-      if (BLACK_STONE==stoneArray[i]){
-      drawStone(i,0);
-      }
-      else if (WHITE_STONE==stoneArray[i]){
-        drawStone(i,1);
-      }
-    }
-  }
-}
-*/
 void SelectorManagment(void){
     if (arduboy.justPressed(UP_BUTTON)){
       if (cursY>=upBorder+casesHeight){
@@ -66,8 +34,8 @@ void SelectorManagment(void){
       }
     }
 }
-void drawSelector(int i){
 
+void drawSelector(int i){
    if (blinkTimer--==0){
     blinkTimer=BLINK_TIMER_INIT;
     blink=!blink;
@@ -82,7 +50,7 @@ void drawSelector(int i){
   arduboy.drawLine(x+2,y-2,x+4,y-4,blink? 1:0);
 }
 
-void moveRobot(bool player1){
+void moveRobot(bool player1, uint8_t wallE){
   uint8_t dir=99;
   if (arduboy.justPressed(UP_BUTTON)){
     dir=HAUT;
@@ -98,15 +66,25 @@ void moveRobot(bool player1){
   }
   if (99!=dir){
     if (player1)
-      p1.move(dir);
+      p1.move(dir,wallE);
     else
-      p2.move(dir);
+      p2.move(dir,wallE);
   }
 }
 
 void inGameMenu(){
   //int x=p1Playing? (leftBorder-42):(leftBorder+80);
-  int x=p1Playing? 0:100;
+  int x;
+  if (p1Playing){
+    x=0;
+    if (leftBorder<LEFTBORDERP1)
+      leftBorder+=(LEFTBORDERP1-leftBorder)/2;
+  }
+  else {
+    x=96;
+    if (leftBorder>LEFTBORDERP2)
+      leftBorder-=(leftBorder-LEFTBORDERP2)/2;
+  }
   arduboy.fillRect(x ,0,31,64,0);
   arduboy.setCursor(x,10);
   arduboy.print(F("Walls"));
@@ -115,7 +93,7 @@ void inGameMenu(){
   arduboy.setCursor(x,50);
   arduboy.print(F("EoT"));
 }
-/*
+
 void turnUpdate(void){ /////////////////////////////////////// score ///////////////////////  score ///////////////////////
   if (1==difficulty) { // for MEMO that have bigger cards in difficulty 1
     arduboy.fillRect(0,0,17,64,0);
@@ -157,5 +135,5 @@ void turnUpdate(void){ /////////////////////////////////////// score ///////////
     arduboy.drawCircle(22,27,3,1); // to picture the remaining (or placed) stones
     arduboy.fillCircle(22,60,3,1);
   }
-}*/
+}
 #endif

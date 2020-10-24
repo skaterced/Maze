@@ -6,17 +6,12 @@
 #include "globals.h"
 #include "function.h"
 
-#define WOB 0 //1 for White on Black
-#define WALL_UP 0x80
-#define WALL_RIGHT 0x40
-#define WALL_DOWN 0x20
-#define WALL_LEFT 0x10
-
 #define SYMETRIC true
 #define NBTILES 42//casesCol*casesRow
 
 uint8_t timeUnit=5;
 uint8_t test=0;
+int scrollIt=0;
 
 class Tile {
   public:
@@ -201,34 +196,30 @@ void imposeWall(uint8_t ind, bool addAndRemove){
   }    
 }
 
-void mazeSetup(void){
-  p1.x=-9;
-  p1.y=31;
-  p2.x=71;
-  p2.y=31;
-  casesCol=7;
-  casesRow=6;
-  casesHeight=10;
-  casesLength=10;
-  leftBorder=48;
-  upBorder=2;
-  //adjSelectX=4;
-  //adjSelectY=4;
-  randomTiles(30, SYMETRIC, true ); //sym //border
-  for (int i=0;i<NBTILES;i++){
-    imposeWall(i, false);
-  }  
+void scrollTiles(uint8_t *col){ // uint8_t[5]
+  //uint8_t col[]={0,0,0,0,0,0}; //def?
+  for(int i=0;i<6;i++){
+    for(int j=0;j<6;j++){
+      //col[j]=tiles[j+i*7].walls;
+      tiles[j+i*7].walls=tiles[j+i*7+1].walls;
+    }
+  }
+  //reboucle
+  for(int i=0;i<6;i++){      
+    tiles[6+i*7].walls=col[i];  
+  }
 }
 
 void playMaze(){
   inGameMenu();
   if (0==WOB)
-    arduboy.fillRect(leftBorder-10,0,88,64,1);
+    arduboy.fillRect(leftBorder-10,0,89,64,1);
+  /*
   if ((arduboy.justPressed(A_BUTTON))||(arduboy.justPressed(B_BUTTON))){    
     uint8_t temp=getIndice(cursX,cursY);
     tiles[findInd(temp)].turn(arduboy.justPressed(A_BUTTON));
     imposeWall(temp, true);
-  }
+  }*/
   for (int i=0;i<NBTILES;i++){
     tiles[i].draw();
 //    if (LAST_TILE==i)
@@ -236,19 +227,48 @@ void playMaze(){
   }
   //SelectorManagment();
   //drawSelector(getIndice(cursX,cursY));
-  moveRobot(p1Playing);//p1
+  uint8_t walls=0;
+  if (p1Playing){
+      walls=tiles[getIndice(p1.x+leftBorder,p1.y+upBorder)].walls;
+  }
+  else{
+      walls=tiles[getIndice(p2.x+leftBorder,p2.y+upBorder)].walls;
+  }
+  moveRobot(p1Playing, walls);//p1
   p1.draw(true, WOB);
   p2.draw(false, WOB);
     //test
-  if (arduboy.justPressed(A_BUTTON)){
-    test++;
-  }
   if (arduboy.justPressed(B_BUTTON)){
-    p1Playing=!p1Playing;
+    //destroyWall
+    if (test++<4){
+      p1Playing=!p1Playing;
+    }
+    else
+      scrollTiles(&message[6*(scrollIt++)]);
+  }
+  if (arduboy.justPressed(A_BUTTON)){    
+    uint8_t temp;
+    bool temp2=true;
+    if (p1Playing){
+      temp=getIndice(p1.x+leftBorder,p1.y+upBorder);
+    if (p1.dir>1)
+      temp2=false;
+    }
+    else {
+      temp=getIndice(p2.x+leftBorder,p2.y+upBorder);
+      if (p2.dir>1)
+        temp2=false;
+    }
+    
+    tiles[findInd(temp)].turn(temp2);
+    imposeWall(temp, true);
   }  
   //Sprites::drawOverwrite(4, 50, robots, test);
-  //p1.score=getIndice(p1.x, p1.y);
-  //p2.score=tiles[findInd(getIndice(p1.x, p1.y))].walls;
+  /*p1.score=getIndice(p1.x, p1.y);
+  p2.score=tiles[findInd(getIndice(p1.x, p1.y))].walls;*/
+  
+  p1.score=getIndice(p1.x+leftBorder,p1.y+upBorder);
+  p2.score=tiles[findInd(getIndice(p1.x+leftBorder,p1.y+upBorder))].walls;  
   //turnUpdate();
   
 }
