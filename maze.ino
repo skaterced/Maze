@@ -88,7 +88,7 @@ void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup
   //upBorder=2;
   //adjSelectX=4;
   //adjSelectY=4;
-  randomTiles(20, SYMETRIC, true ); //sym //border
+  //randomTiles(20, SYMETRIC, true ); //sym //border
   for (int i=0;i<NBTILES;i++){
     imposeWall(i, false);
   }  
@@ -184,6 +184,7 @@ void loop() { // -------------------------  Init loop --------------------------
       if (MAZE==game){
         cursX=50;
         cursY=8;
+        randomTiles(20, SYMETRIC, true ); //sym //border
       }      
     }
   }

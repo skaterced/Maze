@@ -28,7 +28,8 @@ Arduboy2 arduboy;
 #define WALL_RIGHT 0x40
 #define WALL_DOWN 0x20
 #define WALL_LEFT 0x10
-
+#define SYMETRIC true
+#define NBTILES 42//casesCol*casesRow
 #define LEFTBORDERP1 48
 #define LEFTBORDERP2 10
 
@@ -38,6 +39,14 @@ Arduboy2 arduboy;
 
 #define BETWEEN_ROBOTS 8 //Frame difference between Robot1 & Robot2
 
+#define WEAPON_MINE 0
+#define WEAPON_PUNCH 1
+/*
+const char* weaponList[] PROGMEM = {
+  "Mine",
+  "Fist"
+};
+*/
   //Controls designed for Arduboy
 bool forEmulator = false;  // ToDo : remove this and change Menu. No more need for this bool
 uint8_t P1_LEFT=UP_BUTTON;
@@ -62,6 +71,7 @@ uint8_t casesCol=7+difficulty;
 uint8_t casesRow=2+difficulty;
 int leftBorder=LEFTBORDERP1;
 int upBorder=2;
+uint8_t movesLeft=3;
 //int adjSelectX=0; //no more other games... todo: clean
 //int adjSelectY=0;
 
@@ -95,124 +105,90 @@ const unsigned char robots[] PROGMEM = {
 0xff,0xff,0x81,0xd5,0x9d,0xdd,0x81,0xff,
 0xff,0xff,0x81,0x9d,0xd5,0x9d,0x81,0xff,
 0xff,0xff,0x81,0xdd,0x9d,0xd5,0x81,0xff,
-0xff,0xff,0x81,0x9d,0xdd,0x9d,0x81,0xff};
+0xff,0xff,0x81,0x9d,0xdd,0x9d,0x81,0xff
+};
 
-const uint8_t message[] ={0,0,0,0,0,0,
-                   176,0,0,0,208,48, //J
-                   160,0,0,0,0,160,
-                   192,80,80,80,80,96,
-                   0,0,0,0,0,0,
-                   144,80,80,80,80,48, //O
-                   160,0,0,0,0,160,
-                   192,80,80,80,80,96,
-                   0,0,0,0,0,0,
-                   208,80,48,0,0,0, //Y
-                   80,80,128,80,80,112,
-                   208,80,96,0,0,0,
-                   0,0,0,0,0,0,
-                   144,80,16,80,80,48, //E
-                   160,176,224,144,48,160,
-                   224,0,0,0,0,224,
-                   0,0,0,0,0,0,
-                   208,80,80,80,80,48, //U
-                   0,0,0,0,0,160,
-                   208,80,80,80,80,96,
-                   0,0,0,0,0,0,
-                   208,80,48,96,80,112, //X
-                   80,80,128,32,80,80,
-                   208,80,144,192,80,112,
-                   0,0,0,0,0,0,
-                   0,0,0,0,0,0,
-                   0,144,80,16,80,112,//A
-                   208,32,240,160,208,80,
-                   0,192,80,64,80,112,
-                   0,0,0,0,0,0,
-                   144,16,80,80,80,112,  //N
-                   48,192,48,208,16,16,
-                   64,112,192,48,64,64,
-                   208,80,80,64,80,112,
-                   0,0,0,0,0,0,
-                   144,16,80,80,80,112,  //N
-                   48,192,48,208,16,16,
-                   64,112,192,48,64,64,
-                   208,80,80,64,80,112,
-                   0,0,0,0,0,0,
-                   208,80,80,80,80,112, //I
-                   0,0,0,0,0,0,
-                   /*208,80,80,16,48,0, //V
-                   80,80,112,0,0,112,
-                   208,80,80,64,96,0,
-                   0,0,0,0,0,0,
-                   144,80,16,80,80,48, //E
-                   160,176,224,144,48,160,
-                   224,0,0,0,0,224,
-                   0,0,0,0,0,0,
-                   144,80,16,80,80,112, //R
-                   160,240,160,240,0,0,
-                   192,80,96,0,240,0,
-                   0,0,0,0,0,240,
-                   144,80,48,0,0,176, //S
-                   160,0,160,0,0,160,
-                   224,0,192,80,80,96,
-                   0,0,0,0,0,0,
-                   0,144,80,16,80,112,//A
-                   208,32,240,160,208,80,
-                   0,192,80,64,80,112,                  
-                   0,0,0,0,0,0,
-                   208,80,80,80,80,112, //I
-                   0,0,0,0,0,0,
-                   144,80,16,80,80,112, //R
-                   160,240,160,240,0,0,
-                   192,80,96,0,240,0,
-                   0,0,0,0,0,240,
-                   0,0,0,0,0,0,
-                   144,80,16,80,80,48, //E
-                   160,176,224,144,48,160,
-                   224,0,0,0,0,224,*/
-                   
-                   0,0,0,0,0,0,
-                   176,0,0,0,208,48, //J
-                   160,0,0,0,0,160,
-                   192,80,80,80,80,96,
-                   0,0,0,0,0,0,
-                   144,80,16,80,80,112, //P
-                   160,240,160,0,0,0,
-                   192,80,96,0,0,0,
-                   0,0,0,0,0,0,/*
-                   208,80,80,80,80,48, //L
-                   0,0,0,0,0,160,
-                   0,0,0,0,0,224,
-                   0,0,0,0,0,0,
-                   208,80,80,80,80,48, //U
-                   0,0,0,0,0,160,
-                   208,80,80,80,80,96,
-                   0,0,0,0,0,0,
-                   144,80,80,80,80,48, //C
-                   160,0,0,0,0,160,
-                   224,0,0,0,0,224,
-                   0,0,0,0,0,0,*/                   
-                   208,80,80,112,0,240, //!
-                   0,0,0,0,0,0,
-                   208,80,80,112,0,240, //!
-                   0,0,0,0,0,0,
-                   208,80,80,112,0,240, //!
-                   0,0,0,0,0,0
-                                    }; //def?
+class Tile {
+  public:
+    uint8_t i; //indice
+    uint8_t walls;
+    //bool black;
+    //bool selected;
+    Tile(void){}
+    Tile(uint8_t i_, uint8_t walls_){
+      i=i_;
+      walls=walls_;
+      //selected=false;
+    }
+    void draw(void){
+      //uint8_t bomb=(walls&0x0F);
+      int x= leftBorder + (i%casesCol)*casesLength;
+      int y= upBorder + i/casesCol*casesHeight;//+upBorder+2;
+      if (WALL_UP==(walls&WALL_UP)){
+        arduboy.drawLine(x,y,x+casesLength-1,y,WOB);
+        arduboy.drawLine(x,y-1,x+casesLength-1,y-1,WOB);
+      }
+      if (WALL_DOWN==(walls&WALL_DOWN)){
+        arduboy.drawLine(x,y+casesHeight-1,x+casesLength-1,y+casesHeight-1,WOB);
+        arduboy.drawLine(x,y+casesHeight,x+casesLength-1,y+casesHeight,WOB);
+      }      
+      if (WALL_RIGHT==(walls&WALL_RIGHT)){
+        arduboy.drawLine(x+casesLength-1,y,x+casesLength-1,y+casesHeight-1,WOB);
+        arduboy.drawLine(x+casesLength,y,x+casesLength,y+casesHeight-1,WOB);
+      }
+      if (WALL_LEFT==(walls&WALL_LEFT)){
+        arduboy.drawLine(x,y,x,y+casesHeight-1,WOB);
+        arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,WOB);
+      }
+      /*
+      if (1==bomb){
+        walls=(walls&0xF0)|0x08;
+        arduboy.drawChar(x+1,y+1,88,0,0,1);
+        //return true;
+      }*/
+      if (0!=(walls&0x0F)){
+        arduboy.drawCircle(x+4,y+4,2,0);
+        //walls=(walls&0xF0)|--bomb;
+      }
+      //return false;
+    }
+    void turn(bool clockWise){
+      uint8_t onlyWalls=(walls&0xF0);
+      if (clockWise){        
+        onlyWalls*=2;
+        onlyWalls+=(walls&0x80)>>3;
+      }
+      else{
+        onlyWalls/=2;
+        if((onlyWalls&0x08)!=0){
+          onlyWalls&=0xF0;
+          onlyWalls|=0x80;
+        }
+      }
+      walls&=0x0F;
+      walls+=onlyWalls;
+    }    
+};
+/*
+ * || 0xA0
+ *  = 0x50
+ */
+Tile tiles[NBTILES];
 
 class Player {
   public :
     int x,y;
-    uint8_t weapon;
+    uint8_t weaponSel;
     uint8_t dir;
     int score;
     Player(int X, int Y) {
       this->x=X;
       this->y=Y;
-      this->weapon=0;  //
+      this->weaponSel=0;  //
       this->dir=0;      
       this->score=0;
     }
-    draw(bool player1, bool WhiteOnBlack){
+    void draw(bool player1, bool WhiteOnBlack){
       int frame=WhiteOnBlack? 0:4;
       frame+=dir;
       if (!player1){
@@ -220,24 +196,19 @@ class Player {
       }
       Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, frame);
     }
-    move(uint8_t direction, uint8_t walls){
-      dir=direction;
-      switch (dir){
+    void move(uint8_t direction){
+      switch (direction){
         case HAUT:
-          if ((y>=casesHeight)&&((walls&WALL_UP)!=WALL_UP))
-            y-=casesHeight;
+          y-=casesHeight;
         break;
-        case BAS:
-          if ((y<((casesRow-1)*casesHeight))&&((walls&WALL_DOWN)!=WALL_DOWN))
-            y+=casesHeight;
+        case BAS:         
+          y+=casesHeight;
         break;
-        case DROITE:
-          if (((x<((casesCol-1)*casesLength))&&((walls&WALL_RIGHT)!=WALL_RIGHT))||((x<0)&&(y==31)))
-            x+=casesLength;
+        case DROITE:         
+          x+=casesLength;
         break;
        case GAUCHE:
-          if (((x>=(casesLength))&&((walls&WALL_LEFT)!=WALL_LEFT))||((x>70)&&(y==31)))
-            x-=casesLength;
+          x-=casesLength;
         break;
       }
     }
