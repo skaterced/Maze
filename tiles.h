@@ -6,7 +6,7 @@
 #include "globals.h"
 #include "function.h"
 
-int scrollIt=0;
+//int scrollIt=0;
 
 int findInd(uint8_t ind){ //return the indice (in the tiles array) that is on the given grid indice
   for (int i=0; i<casesCol*casesRow; i++){
@@ -50,47 +50,6 @@ int voisin(uint8_t ind, uint8_t direction){  //Yes, I switched back to french. I
   return -1;
 }
 
-void randomTiles (uint8_t randWall, bool sym, bool border){
-  for (int i=0; i<NBTILES; i++){
-    tiles[i].i=i; //thatt's a whole bunch of i's...
-    uint8_t tw=0; //tiles[i].walls
-    if (sym&&(i%casesCol>(casesCol/2))){ 
-      tw=tiles[i-2*(i%casesCol-casesCol/2)].walls;
-      bool temp=tw&WALL_LEFT;  // méthode bête et méchante...
-      bool temp2=tw&WALL_RIGHT;
-      tw&=~(WALL_LEFT|WALL_RIGHT);
-      tw+=(temp? WALL_RIGHT:0);
-      tw+=(temp2? WALL_LEFT:0);
-    }
-    else{
-      for (int j=0; j<4; j++){
-        tw=tw<<1;
-        if (random(100)<randWall)
-          tw+=0x10;      
-      }
-    }
-    if (sym&&(i%casesCol==(casesCol/2))){ 
-      if (tw&WALL_LEFT){
-        tw|=WALL_RIGHT;
-      }
-      else {
-        tw&=~(WALL_LEFT|WALL_RIGHT);
-      }
-    }
-    tiles[i].walls=tw;
-  }
-  if (border){
-    for (int i=0; i<NBTILES; i++){ //must be in another loop, otherwise les voisins ne sont pas définis
-      for (int j=0; j<4; j++){
-        if (-1==voisin(i,j))
-          tiles[i].walls|=(0x10<<j);        
-      }
-    }
-    tiles[21].walls&=~WALL_LEFT;  //entrance
-    tiles[27].walls&=~WALL_RIGHT;
-  }
-}
-
 void imposeWall(uint8_t ind, bool addAndRemove){
   uint8_t tileInd=findInd(ind);
   int temp=voisin(ind, HAUT);  
@@ -129,6 +88,52 @@ void imposeWall(uint8_t ind, bool addAndRemove){
       tiles[temp].walls&=(~WALL_RIGHT);
     }
   }    
+}
+
+void randomTiles (uint8_t randWall, bool sym, bool border){
+  for (int i=0; i<NBTILES; i++){
+    tiles[i].i=i; //thatt's a whole bunch of i's...
+    uint8_t tw=0; //tiles[i].walls
+    if (sym&&(i%casesCol>(casesCol/2))){ 
+      tw=tiles[i-2*(i%casesCol-casesCol/2)-1].walls;
+      bool temp=tw&WALL_LEFT;  // méthode bête et méchante...
+      bool temp2=tw&WALL_RIGHT;
+      tw&=~(WALL_LEFT|WALL_RIGHT);
+      tw+=(temp? WALL_RIGHT:0);
+      tw+=(temp2? WALL_LEFT:0);
+    }
+    else{
+      tw=0;
+      for (int j=0; j<4; j++){
+        tw=tw<<1;
+        if (random(100)<randWall)
+          tw+=0x10;      
+      }
+    }
+    /*
+    if (sym&&(i%casesCol==(casesCol/2))){ 
+      if (tw&WALL_LEFT){
+        tw|=WALL_RIGHT;
+      }
+      else {
+        tw&=~(WALL_LEFT|WALL_RIGHT);
+      }
+    }*/
+    tiles[i].walls=tw;
+  }
+  if (border){
+    for (int i=0; i<NBTILES; i++){ //must be in another loop, otherwise les voisins ne sont pas définis
+      for (int j=0; j<4; j++){
+        if (-1==voisin(i,j))
+          tiles[i].walls|=(0x10<<j);        
+      }
+    }
+    tiles[21].walls&=~WALL_LEFT;  //entrance
+    tiles[27].walls&=~WALL_RIGHT;
+  }
+  for (int i=0;i<NBTILES;i++){
+    imposeWall(i, false);
+  }
 }
 
 void scrollTiles(uint8_t *col){ // uint8_t[5]

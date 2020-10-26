@@ -76,23 +76,6 @@ void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup
   arduboy.clear();
   arduboy.setFrameRate(60);
   
-  /*cursX=-9;
-  cursY=31;
-  p2.x=71;
-  p2.y=31;*/
-  casesCol=7;
-  casesRow=6;
-  casesHeight=10;
-  casesLength=10;
-  //leftBorder=LEFTBORDERP1;
-  //upBorder=2;
-  //adjSelectX=4;
-  //adjSelectY=4;
-  //randomTiles(20, SYMETRIC, true ); //sym //border
-  for (int i=0;i<NBTILES;i++){
-    imposeWall(i, false);
-  }  
-
 }
 
 void loop() { // -------------------------  Init loop -------------------------------------------------------------------------
@@ -185,6 +168,10 @@ void loop() { // -------------------------  Init loop --------------------------
         cursX=50;
         cursY=8;
         randomTiles(20, SYMETRIC, true ); //sym //border
+        /*for (int i=0;i<NBTILES;i++){ inside randomTiles now
+          imposeWall(i, false);
+        } */ 
+        movesLeft=movesInit;
       }      
     }
   }

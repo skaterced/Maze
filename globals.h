@@ -29,9 +29,9 @@ Arduboy2 arduboy;
 #define WALL_DOWN 0x20
 #define WALL_LEFT 0x10
 #define SYMETRIC true
-#define NBTILES 42//casesCol*casesRow
-#define LEFTBORDERP1 48
-#define LEFTBORDERP2 10
+#define NBTILES 48//casesCol*casesRow
+#define LEFTBORDERP1 46
+#define LEFTBORDERP2 2
 
 #define BLINK_TIMER_INIT 5
 //#define BLACK_STONE 1 // (P1)
@@ -41,6 +41,8 @@ Arduboy2 arduboy;
 
 #define WEAPON_MINE 0
 #define WEAPON_PUNCH 1
+
+#define BOMB_RANGE_MAX 2
 /*
 const char* weaponList[] PROGMEM = {
   "Mine",
@@ -65,10 +67,10 @@ int8_t selectedI=-1;
 bool removing=false;
 bool blink=true;
 uint8_t blinkTimer=BLINK_TIMER_INIT;
-uint8_t casesLength=8;
-uint8_t casesHeight=11;
-uint8_t casesCol=7+difficulty;
-uint8_t casesRow=2+difficulty;
+uint8_t casesLength=10;
+uint8_t casesHeight=10;
+uint8_t casesCol=8;
+uint8_t casesRow=6;
 int leftBorder=LEFTBORDERP1;
 int upBorder=2;
 uint8_t movesLeft=3;
@@ -77,6 +79,7 @@ uint8_t movesLeft=3;
 
 int cursX=4;
 int cursY=30;
+uint8_t movesInit=5;
 
 //uint8_t stoneArray [81];
 
@@ -121,7 +124,6 @@ class Tile {
       //selected=false;
     }
     void draw(void){
-      //uint8_t bomb=(walls&0x0F);
       int x= leftBorder + (i%casesCol)*casesLength;
       int y= upBorder + i/casesCol*casesHeight;//+upBorder+2;
       if (WALL_UP==(walls&WALL_UP)){
@@ -147,8 +149,12 @@ class Tile {
         //return true;
       }*/
       if (0!=(walls&0x0F)){
-        arduboy.drawCircle(x+4,y+4,2,0);
-        //walls=(walls&0xF0)|--bomb;
+        if (0x08==(walls&0x08)){
+          arduboy.drawChar(x+2,y+1,88,0,1,1); //"X" for nox
+        }
+        else {
+          arduboy.drawCircle(x+4,y+4,2,0);
+        }        
       }
       //return false;
     }
@@ -222,7 +228,7 @@ class Player {
     Sprites::drawOverwrite(p2.x,p2.y , robots, frame+BETWEEN_ROBOTS+p2.dir );
 }
 */
-class Player p1(-9,31);
+class Player p1(1,31);
 class Player p2(71,31);
 
 #endif
