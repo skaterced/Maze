@@ -6,7 +6,75 @@
 #include "globals.h"
 #include "function.h"
 
-//int scrollIt=0;
+//int scrollIt=0;$
+
+
+class Tile {
+  public:
+    uint8_t i; //indice
+    uint8_t walls;
+    //bool black;
+    //bool selected;
+    Tile(void){}
+    Tile(uint8_t i_, uint8_t walls_){
+      i=i_;
+      walls=walls_;
+      //selected=false;
+    }
+    void draw(void){
+      int x= leftBorder + (i%casesCol)*casesLength;
+      int y= upBorder + i/casesCol*casesHeight;//+upBorder+2;
+      if (WALL_UP==(walls&WALL_UP)){
+        arduboy.drawLine(x,y,x+casesLength-1,y,WOB);
+        arduboy.drawLine(x,y-1,x+casesLength-1,y-1,WOB);
+      }
+      if (WALL_DOWN==(walls&WALL_DOWN)){
+        arduboy.drawLine(x,y+casesHeight-1,x+casesLength-1,y+casesHeight-1,WOB);
+        arduboy.drawLine(x,y+casesHeight,x+casesLength-1,y+casesHeight,WOB);
+      }      
+      if (WALL_RIGHT==(walls&WALL_RIGHT)){
+        arduboy.drawLine(x+casesLength-1,y,x+casesLength-1,y+casesHeight-1,WOB);
+        arduboy.drawLine(x+casesLength,y,x+casesLength,y+casesHeight-1,WOB);
+      }
+      if (WALL_LEFT==(walls&WALL_LEFT)){
+        arduboy.drawLine(x,y,x,y+casesHeight-1,WOB);
+        arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,WOB);
+      }
+      /*
+      if (1==bomb){
+        walls=(walls&0xF0)|0x08;
+        arduboy.drawChar(x+1,y+1,88,0,0,1);
+        //return true;
+      }*/
+      if (0!=(walls&0x0F)){
+        if (0x08==(walls&0x08)){
+          arduboy.drawChar(x+2,y+1,88,0,1,1); //"X" for nox
+        }
+        else {
+          arduboy.drawCircle(x+4,y+4,2,0);
+        }        
+      }
+      //return false;
+    }
+    void turn(bool clockWise){
+      uint8_t onlyWalls=(walls&0xF0);
+      if (clockWise){        
+        onlyWalls*=2;
+        onlyWalls+=(walls&0x80)>>3;
+      }
+      else{
+        onlyWalls/=2;
+        if((onlyWalls&0x08)!=0){
+          onlyWalls&=0xF0;
+          onlyWalls|=0x80;
+        }
+      }
+      walls&=0x0F;
+      walls+=onlyWalls;
+    }    
+};
+
+Tile tiles[NBTILES];
 
 int findInd(uint8_t ind){ //return the indice (in the tiles array) that is on the given grid indice
   for (int i=0; i<casesCol*casesRow; i++){

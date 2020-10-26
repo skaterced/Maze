@@ -73,14 +73,14 @@ uint8_t casesCol=8;
 uint8_t casesRow=6;
 int leftBorder=LEFTBORDERP1;
 int upBorder=2;
-uint8_t movesLeft=3;
+
 //int adjSelectX=0; //no more other games... todo: clean
 //int adjSelectY=0;
 
 int cursX=4;
 int cursY=30;
-uint8_t movesInit=5;
-
+uint8_t movesInit=4;
+uint8_t movesLeft=movesInit/2;
 //uint8_t stoneArray [81];
 
 const unsigned char robots[] PROGMEM = {
@@ -111,6 +111,7 @@ const unsigned char robots[] PROGMEM = {
 0xff,0xff,0x81,0x9d,0xdd,0x9d,0x81,0xff
 };
 
+/*
 class Tile {
   public:
     uint8_t i; //indice
@@ -142,12 +143,6 @@ class Tile {
         arduboy.drawLine(x,y,x,y+casesHeight-1,WOB);
         arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,WOB);
       }
-      /*
-      if (1==bomb){
-        walls=(walls&0xF0)|0x08;
-        arduboy.drawChar(x+1,y+1,88,0,0,1);
-        //return true;
-      }*/
       if (0!=(walls&0x0F)){
         if (0x08==(walls&0x08)){
           arduboy.drawChar(x+2,y+1,88,0,1,1); //"X" for nox
@@ -175,11 +170,9 @@ class Tile {
       walls+=onlyWalls;
     }    
 };
-/*
- * || 0xA0
- *  = 0x50
+
  */
-Tile tiles[NBTILES];
+//Tile tiles[NBTILES];
 
 class Player {
   public :

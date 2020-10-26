@@ -1,58 +1,18 @@
-
-/*  Welcome to my first Arduboy Game.
-
-    About the Games :
-    
+/*  Welcome to  ** Robot Maze **. It might still evolve but for now it is a 2 players turn based Bomberman 
+ *      
       Menu:
-        left and right to change game, A to select, B for the settings menu where
-        You can change global DIFFICULTY. It will affect Trace and Pong speed, and MEMO ammount of cards (from 3X8 to 6x11)
+        To be defined
         
-      CONTROLS : As it was developped (and will surely be played often) with the Emulator, the controls are optimized for Emulator OR Arduboy
-                You can change defaut Controls settings by commenting or decommenting some lines -> look for "bool forEmulator"
-          Emulator (PC) :
-            Pong, Trace and ReflX are played with A and B for player 1 and UP and DOWN for player 2
-          Arduboy :
-            Pong, Trace and ReflX are played with UP and DOWN for player 1 and A and B for player 2
-            
-          MEMO : Arrows for moving the cursor, A to select a card
-          MILL : Arrows for moving the cursor, A to select a Stone, B to cancel selection
-          GO   : Arrows for moving the cursor, A to add/remove a Black Stone, B to add/remove a White Stone 
-
-      RULES:
-        
-        Pong:   Do I Really have to explain ?
-        Trace:  Survive longer than your opponent
-        ReflX:  Before each round there is a new rule (normal or inverted) for the 2 kind of arrows (White on Black BackGround or Black on White Bg)
-                after both players are ready and have pressed "down" (cf CONTROLS) they wait a random time and then the arrow appears.
-                +1 point if you press the correct direction depending on the rule, and -1 if you press the wrong one.
-                Both players can press at the same time and get the point (or lose it).
-        MEMO:   select a card and flip it with button A. Flip a second card and if they math you get the point. When there is no more card,
-                the player with more pointsw wins. Note: the cards are bigger if you select the minimal difficulty (3x8)
-        MILL:   Th first 9 Stones can be placed anywhere. After that you must select a stone with A and place it in a free adjacent space.
-                Align 3 stones on the same line to form a "mill". If you do so you can remove an oppenent stone, except if it's part of a mill.
-                If you only have 3 stones left, you can move not only by following the lines but where you want.
-                You win if your opponent has only 2 stones left OR if he is "stuck" with nowhere to move any of his stones.
-                Look up for "Nine Men's Morris" for more information
-    GO/CHESS:   There are no rules check. Look up Wikipedia to lurn the rules
+      CONTROLS : 
+          Arrows: move your Robot
+          B: drop a Bomb (for now)
+          A+Left/Right: Turn the tile couter-clockwise/clockwise
+          A+Up/Down: (not yet but...) Change the B button effect          
           
-          
-      Hope you'll enjoy !
-
-
-    Special thanks to my brother Jean-Philippe who taught me how to code and wrote the "original" Trace inspired by the movie TRON
-    and thanks to Pharap who spends a lot of time helping coding people
-   
+      Hope you'll enjoy !   
 */
 
-//#include "pong.h"
-//#include "trace.h"
-//#include "reflx.h"
-#include "maze.h"
-//#include "memo.h"
-//#include "mill.h"
-//#include "chess.h"
-//#include "go.h"
-
+#include "maze.h" 
 #include "globals.h"
 #include "function.h" 
 

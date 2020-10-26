@@ -84,26 +84,38 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
     }
   }
   else if (arduboy.justPressed(UP_BUTTON)){
-    dir=HAUT;      
-    //if ((pp->y>=casesHeight)&&((walls&WALL_UP)!=WALL_UP)){
-    if (canGoTo(temp,dir)){
-      pp->move(dir);
-      stay=false;
+    if (arduboy.pressed(A_BUTTON)){
+      //select weapon
+    }
+    else {
+      dir=HAUT;      
+      //if ((pp->y>=casesHeight)&&((walls&WALL_UP)!=WALL_UP)){
+      if (canGoTo(temp,dir)){
+        pp->move(dir);
+        stay=false;
+      }
     }
   }
   else if (arduboy.justPressed(DOWN_BUTTON)){
-    dir=BAS;
-    //if ((pp->y<((casesRow-1)*casesHeight))&&((walls&WALL_DOWN)!=WALL_DOWN)){
-    if (canGoTo(temp,dir)){
-      stay=false;
-      pp->move(dir);
+    if (arduboy.pressed(A_BUTTON)){
+      //select weapon
+    }
+    else {
+      dir=BAS;
+      //if ((pp->y<((casesRow-1)*casesHeight))&&((walls&WALL_DOWN)!=WALL_DOWN)){
+      if (canGoTo(temp,dir)){
+        stay=false;
+        pp->move(dir);
+      }
     }
   }
   else if (arduboy.justPressed(RIGHT_BUTTON)){
     if (arduboy.pressed(A_BUTTON)){
-      tiles[findInd(temp)].turn(false);
-      imposeWall(temp, true);
-      movesLeft--;
+      if (0!=tiles[findInd(temp)].walls){
+        tiles[findInd(temp)].turn(false);
+        imposeWall(temp, true);
+        movesLeft--;
+      }
     }
     else {
       dir=DROITE;
@@ -116,9 +128,11 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
   }
   else if (arduboy.justPressed(LEFT_BUTTON)){
     if (arduboy.pressed(A_BUTTON)){
-      tiles[findInd(temp)].turn(true);
-      imposeWall(temp, true);
-      movesLeft--;
+      if (0!=tiles[findInd(temp)].walls){
+        tiles[findInd(temp)].turn(true);
+        imposeWall(temp, true);
+        movesLeft--;
+      }
     }
     else {
       dir=GAUCHE;
@@ -178,9 +192,7 @@ void checkBombs(void){
         //boom
         //tiles[i].walls|=0x08;
         //tiles[i].walls&=0xF8;
-        explode(i,1);
-        
-
+        explode(i,1);        
       }
     }
   }
@@ -193,8 +205,7 @@ void inGameMenu(){
   if (p1Playing){
     x=0;
     if (leftBorder<LEFTBORDERP1)
-      leftBorder+=(LEFTBORDERP1-leftBorder)/2;
-      
+      leftBorder+=(LEFTBORDERP1-leftBorder)/2;      
   }
   else {
     x=87;
@@ -206,12 +217,30 @@ void inGameMenu(){
   arduboy.print(F("Moves"));
   arduboy.setCursor(x,10);
   arduboy.print(movesLeft);
-  arduboy.setCursor(x,30);
-  arduboy.print(F("Equiped"));
-  arduboy.setCursor(x+5,40);
-  arduboy.print(F("Bomb"));
-  //arduboy.print(s);
-  //arduboy.print(F("EoT"));
+  if (arduboy.pressed(A_BUTTON)){
+    arduboy.drawChar(x,25,27,1,0,1);
+    arduboy.drawChar(x+5,25,26,1,0,1);
+    arduboy.setCursor(x+13,25);
+    arduboy.print(F("Turn"));
+    arduboy.setCursor(x,34);
+    arduboy.print(F("Walls"));
+    arduboy.drawChar(x,46,24,1,0,1);
+    arduboy.drawChar(x+5,47,25,1,0,1);    
+    arduboy.setCursor(x+13,47);
+    arduboy.print(F("Sel"));
+    arduboy.setCursor(x,56);
+    arduboy.print(F("Weapon"));
+  }
+  else {
+    arduboy.setCursor(x,30);
+    arduboy.print(F("B for:"));
+    arduboy.setCursor(x+5,40);
+    arduboy.print(F("Bomb"));
+    arduboy.setCursor(x,55);
+    arduboy.print(F("A+..."));
+    //arduboy.print(s);
+    //arduboy.print(F("EoT"));
+  }
 }
 /*
 void turnUpdate(void){ /////////////////////////////////////// score ///////////////////////  score ///////////////////////
