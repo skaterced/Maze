@@ -12,12 +12,16 @@
       Hope you'll enjoy !   
 */
 
-#include "maze.h" 
+//#include "maze.h" 
 #include "globals.h"
 #include "function.h" 
+#include "robot.h"
 
 #define NBGAMES 8
- 
+
+uint8_t timeUnit=5;
+uint8_t test=0;
+
 const unsigned char PROGMEM picture[] =
 {
 // width, height,
@@ -40,7 +44,7 @@ void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup
 
 void loop() { // -------------------------  Init loop -------------------------------------------------------------------------
   //testP++; //for .h testing (doesn't work )
-  //timer++;
+  timer++;
   //arduboy.pollButtons();  
   
   arduboy.clear(); 
@@ -50,7 +54,7 @@ void loop() { // -------------------------  Init loop --------------------------
   arduboy.pollButtons();    
     
   if (MENU==game){ 
-    arduboy.drawChar(1,1,82,1,0,3);
+    arduboy.drawChar(1,1,82,1,0,3); //ROBOT MAZE
     arduboy.drawChar(17,1,79,1,0,3);
     arduboy.drawChar(33,1,66,1,0,3);
     arduboy.drawChar(49,1,79,1,0,3);
@@ -64,56 +68,6 @@ void loop() { // -------------------------  Init loop --------------------------
     arduboy.setCursor(10,55);
     arduboy.print("  <-  Start ->");
     
-  /*
-    timer++;
-    arduboy.drawBitmap(0,0,picture,128,48,WHITE);
-    //arduboy.drawChar(2,50,17,1,0,1);
-    arduboy.setCursor(10,49);
-    switch(cursX){
-      case (PONG):
-        arduboy.print("      Pong  ->");
-      break;
-      case (TRACE):
-        arduboy.print("  <-  Trace ->");
-      break;
-      case (MAZE):
-        arduboy.print("  <-  Start ->");
-      break;
-      case (MEMO):
-        arduboy.print("  <-  Memo  ->");
-      break;
-      case (MILL):
-        arduboy.print("  <-  Mill  ->");
-      break;
-      case (GO):
-        arduboy.print("  <-   Go   ->");
-      break;   
-      case (CHESS):
-        arduboy.print("  <-  Chess ->");
-      break;      
-      case (REFLX):
-        arduboy.print("  <-  ReflX");
-      break;      
-    }
-    //arduboy.print(TRACE_FPS);
-    
-    //arduboy.drawChar(120,50,16,1,0,1);
-    arduboy.setCursor(1,57);
-    arduboy.print("A: Select    B: Param");
-  
-    if (arduboy.justPressed(RIGHT_BUTTON))
-    {
-      if (cursX<NBGAMES+1){
-        cursX++;
-      }
-    }
-    if (arduboy.justPressed(LEFT_BUTTON))
-    {
-      if (cursX>2){
-        cursX--;
-      }
-    }
-    */
     if (arduboy.justPressed(B_BUTTON))
     {
       game=MENU2;
@@ -122,7 +76,7 @@ void loop() { // -------------------------  Init loop --------------------------
     if (arduboy.justPressed(A_BUTTON))
     {
       arduboy.initRandomSeed();
-      randomSeed(timer*37);
+      randomSeed((int)timer*37);
       game=cursX;
       if (MAZE==game){
         cursX=50;
@@ -135,14 +89,13 @@ void loop() { // -------------------------  Init loop --------------------------
       }      
     }
   }
-  else if (MENU2==game){  
-    timer++;
+  else if (MENU2==game){      
     arduboy.setCursor(10,10);
     arduboy.print("Difficulty : ");
     arduboy.print(difficulty);
     arduboy.setCursor(10,20);
     arduboy.print("Controls : " );
-    arduboy.print(forEmulator ? "PC":"Arduboy");
+//    arduboy.print(forEmulator ? "PC":"Arduboy");
     arduboy.setCursor(0,55);
     arduboy.print("WW.Github.com/skaterced");
     arduboy.setCursor(1,40);
@@ -171,21 +124,6 @@ void loop() { // -------------------------  Init loop --------------------------
           if (++difficulty==5)
             difficulty=1;
         break;
-        case 1:
-          forEmulator = !forEmulator;
-          if (forEmulator) {
-            P2_RIGHT=UP_BUTTON;
-            P1_LEFT=A_BUTTON;
-            P1_RIGHT=B_BUTTON;
-            P2_LEFT=DOWN_BUTTON;
-          }
-          else {
-            P1_LEFT=UP_BUTTON;
-            P1_RIGHT=DOWN_BUTTON;
-            P2_RIGHT=B_BUTTON;
-            P2_LEFT=A_BUTTON;
-          }
-        break;
       }
       
     }
@@ -195,55 +133,45 @@ void loop() { // -------------------------  Init loop --------------------------
       arduboy.clear();
     }     
   }
+  
+  else if (MAZE==game){  // _____________________|     |___________| Maze |___________|    |______________________________|
+    //arduboy.clear();
+  /* //test
+  p1.score=getIndice(p1.x+leftBorder,p1.y+upBorder);
+  p2.score=tiles[findInd(getIndice(p1.x+leftBorder,p1.y+upBorder))].walls;    
+  inGameMenu(true, p1.score, p2.score); //"test mode" if true
+  */
+  inGameMenu(false, 0,0); //"test mode" if true
+  
+  if (0==WOB)
+    arduboy.fillRect(leftBorder-2,0,84,64,1);
 
-  #ifdef trace_h  
-    else if (PONG==game){     //  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||    Pong   |||||||||||||||||||||||||||||||||||||||||
-      playPong();
-    }
-  #endif
-  #ifdef trace_h
-    else if (game==TRACE) // ---------------------------------------------------------------- Trace  -----------------------------
-    {
-      playTrace();
-    }
-  #endif
+  for (int i=0;i<NBTILES;i++){
+    tiles[i].draw();
+  }
+  //SelectorManagment();
+  //drawSelector(getIndice(cursX,cursY));
 
-  #ifdef reflx_h
-    else if (REFLX==game){ // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ReflX xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      playReflx();
+  if (controlRobot()){ // check buttons and play robot's action
+    //ticks (robot has done one action)
+    if (checkBombs()){
+      timer=0;
+      if (0x08==(tiles[getIndice(p1.x,p1.y)].walls&0x08))
+        p1.dir=69;
+      if (0x08==(tiles[getIndice(p2.x,p2.y)].walls&0x08))
+        p2.dir=69;
     }
-  #endif
-  
-  #ifdef memo_h
-  else if (MEMO==game){  // ############################################  MEMO #################################
-    playMemo();
   }
-  #endif
-  
-  #ifdef mill_h
-  else if (MILL==game){  // -----------------++--+--++-+-------+-----+-+----++ MILL ++--+-++--++--++--+---++-++
-    playMill();
+  if(movesLeft==0){
+    movesLeft=movesInit;
+    p1Playing=!p1Playing;
   }
-  #endif
+  p1.drawBombs();
+  p2.drawBombs();
+  p1.draw(true, WOB);  
+  p2.draw(false, WOB);    
+  }
   
-  #ifdef go_h
-    else if (GO==game){  // -----------------++--+--++-+-------+-----+-+----++ GO ++--+-++--++--++--+---++-++
-      //arduboy.clear();
-      playGo();
-    }
-  #endif
-  #ifdef chess_h
-    else if (CHESS==game){  // ######################################################### Chess ###############################
-      //arduboy.clear();
-      playChess();
-    }
-  #endif
-  #ifdef maze_h
-    else if (MAZE==game){  // _____________________|     |___________| Maze |___________|    |______________________________|
-      //arduboy.clear();
-      playMaze();
-    }
-  #endif  
   else {
     arduboy.setCursor(0,0);
     arduboy.println("please recompile with");

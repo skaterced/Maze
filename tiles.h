@@ -40,20 +40,20 @@ class Tile {
         arduboy.drawLine(x,y,x,y+casesHeight-1,WOB);
         arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,WOB);
       }
-      /*
-      if (1==bomb){
-        walls=(walls&0xF0)|0x08;
-        arduboy.drawChar(x+1,y+1,88,0,0,1);
-        //return true;
-      }*/
-      if (0!=(walls&0x0F)){
-        if (0x08==(walls&0x08)){
-          arduboy.drawChar(x+2,y+1,88,0,1,1); //"X" for nox
+      if (0x08==(walls&0x08)){
+        if (timer<10)
+          arduboy.drawChar(x+2,y+1,'O',0,1,1); //"X" for nox
+        else if (timer<20)
+          arduboy.drawChar(x+2,y+1,'@',0,1,1); //"X" for nox
+        else {
+          walls&=0xF0;
         }
+      }
+      /*
         else {
           arduboy.drawCircle(x+4,y+4,2,0);
         }        
-      }
+      }*/
       //return false;
     }
     void turn(bool clockWise){

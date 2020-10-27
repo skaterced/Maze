@@ -5,12 +5,18 @@
 
 #include "globals.h"
 #include "function.h"
+#include "robot.h"
 
-uint8_t timeUnit=5;
-uint8_t test=0;
 
+/*
 void playMaze(){
-  inGameMenu();
+  /* //test
+  p1.score=getIndice(p1.x+leftBorder,p1.y+upBorder);
+  p2.score=tiles[findInd(getIndice(p1.x+leftBorder,p1.y+upBorder))].walls;    
+  inGameMenu(true, p1.score, p2.score); //"test mode" if true
+  */
+  inGameMenu(false, 0,0); //"test mode" if true
+  
   if (0==WOB)
     arduboy.fillRect(leftBorder-2,0,84,64,1);
 
@@ -28,16 +34,9 @@ void playMaze(){
     movesLeft=movesInit;
     p1Playing=!p1Playing;
   }
-  p1.draw(true, WOB);
+  p1.drawBombs();
+  p2.drawBombs();
+  p1.draw(true, WOB);  
   p2.draw(false, WOB);
-  
-  //test  
-  //Sprites::drawOverwrite(4, 50, robots, test);
-  /*p1.score=getIndice(p1.x, p1.y);
-  p2.score=tiles[findInd(getIndice(p1.x, p1.y))].walls;*/ 
-  p1.score=getIndice(p1.x+leftBorder,p1.y+upBorder);
-  p2.score=tiles[findInd(getIndice(p1.x+leftBorder,p1.y+upBorder))].walls;  
-  //turnUpdate();
-  
-}
+}*/
 #endif
