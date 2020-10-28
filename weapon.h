@@ -3,18 +3,15 @@
 
 #include "globals.h"
 
-#define NB_BOMB_MAX 3
-#define BOMB_DEFAULT_T 7
-
 class Bomb {
   public :
     int x,y;
     uint8_t range;
-    uint8_t counter; //1 means exploding, 0 means inactive  
+    uint8_t counter; // decreasing to 0 means exploding, then inactive  
     Bomb(void) {
       this->x=0;
       this->y=0;
-      this->range=1;  //
+      //this->range=1;  //-> robot
       this->counter=0;            
     }
     void draw(void){

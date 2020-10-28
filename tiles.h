@@ -12,9 +12,7 @@
 class Tile {
   public:
     uint8_t i; //indice
-    uint8_t walls;
-    //bool black;
-    //bool selected;
+    uint8_t walls; //bit 7-4: walls  bit 3: explosion  bit 2: Stuff explosion can go throug  bit 1: stuff that block explosion spreading (but is destroyed)  bit 0: unbreakable stuff
     Tile(void){}
     Tile(uint8_t i_, uint8_t walls_){
       i=i_;
@@ -40,7 +38,7 @@ class Tile {
         arduboy.drawLine(x,y,x,y+casesHeight-1,WOB);
         arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,WOB);
       }
-      if (0x08==(walls&0x08)){
+      if (WALL_EXPLOSION==(walls&WALL_EXPLOSION)){
         if (timer<10)
           arduboy.drawChar(x+2,y+1,'O',0,1,1); //"X" for nox
         else if (timer<20)
@@ -64,7 +62,7 @@ class Tile {
       }
       else{
         onlyWalls/=2;
-        if((onlyWalls&0x08)!=0){
+        if((onlyWalls&WALL_EXPLOSION)!=0){
           onlyWalls&=0xF0;
           onlyWalls|=0x80;
         }
@@ -162,7 +160,7 @@ void randomTiles (uint8_t randWall, bool sym, bool border){
   for (int i=0; i<NBTILES; i++){
     tiles[i].i=i; //thatt's a whole bunch of i's...
     uint8_t tw=0; //tiles[i].walls
-    if (sym&&(i%casesCol>(casesCol/2))){ 
+    if (sym&&(i%casesCol>=(casesCol/2))){ 
       tw=tiles[i-2*(i%casesCol-casesCol/2)-1].walls;
       bool temp=tw&WALL_LEFT;  // méthode bête et méchante...
       bool temp2=tw&WALL_RIGHT;

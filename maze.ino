@@ -39,9 +39,16 @@ void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup
   arduboy.begin();
   arduboy.clear();
   arduboy.setFrameRate(60);
-  
+  arduboy.initRandomSeed();  
 }
 
+void mazeInit(void){
+  randomSeed((int)timer*37);  
+  cursX=50;
+  cursY=8;
+  randomTiles(20, SYMETRIC, true ); //sym //border
+  movesLeft=movesInit/2;
+}
 void loop() { // -------------------------  Init loop -------------------------------------------------------------------------
   //testP++; //for .h testing (doesn't work )
   timer++;
@@ -75,18 +82,10 @@ void loop() { // -------------------------  Init loop --------------------------
     }    
     if (arduboy.justPressed(A_BUTTON))
     {
-      arduboy.initRandomSeed();
-      randomSeed((int)timer*37);
       game=cursX;
       if (MAZE==game){
-        cursX=50;
-        cursY=8;
-        randomTiles(20, SYMETRIC, true ); //sym //border
-        /*for (int i=0;i<NBTILES;i++){ inside randomTiles now
-          imposeWall(i, false);
-        } */ 
-        movesLeft=movesInit;
-      }      
+        mazeInit();     
+      }
     }
   }
   else if (MENU2==game){      
@@ -156,9 +155,9 @@ void loop() { // -------------------------  Init loop --------------------------
     //ticks (robot has done one action)
     if (checkBombs()){
       timer=0;
-      if (0x08==(tiles[getIndice(p1.x,p1.y)].walls&0x08))
+      if (WALL_EXPLOSION==(tiles[getIndice(p1.x,p1.y)].walls&WALL_EXPLOSION))
         p1.dir=69;
-      if (0x08==(tiles[getIndice(p2.x,p2.y)].walls&0x08))
+      if (WALL_EXPLOSION==(tiles[getIndice(p2.x,p2.y)].walls&WALL_EXPLOSION))
         p2.dir=69;
     }
   }

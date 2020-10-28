@@ -9,25 +9,21 @@ Arduboy2 arduboy;
 //todo clean those define
 #define MENU 0
 #define MENU2 1
-#define PONG 2
-#define TRACE 3
 #define MAZE 4
-#define MEMO 5
-#define MILL 6
-#define GO 7
-#define CHESS 8
-#define REFLX 9
+#define WOB 0 //1 for White on Black... I think I'll stick to Black on White
 
 #define HAUT 3
 #define DROITE 2
 #define BAS 1
 #define GAUCHE 0
-
-#define WOB 0 //1 for White on Black
 #define WALL_UP 0x80
 #define WALL_RIGHT 0x40
 #define WALL_DOWN 0x20
 #define WALL_LEFT 0x10
+#define WALL_EXPLOSION 0x08
+#define WALL_OQP 0x04
+#define WALL_BLOCK 0x02
+#define WALL_SOLID_BLOCK 0x01
 #define SYMETRIC true
 #define NBTILES 48//casesCol*casesRow
 #define LEFTBORDERP1 46
@@ -43,6 +39,9 @@ Arduboy2 arduboy;
 #define WEAPON_PUNCH 1
 
 #define BOMB_RANGE_MAX 3
+#define NB_BOMB_MAX 3
+#define BOMB_DEFAULT_T 9
+
 /*
 const char* weaponList[] PROGMEM = {
   "Mine",
