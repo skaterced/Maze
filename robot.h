@@ -57,7 +57,7 @@ class Player {
     int x,y;
     uint8_t weapons; //0 means normal Bombs
     uint8_t range;
-    uint8_t dir; //if dir==69, direction paradise
+    uint8_t dir; //if dir==ROBOT_DIED, direction heaven
     int score;
     Bomb bombs[3];
     Player(int X, int Y) {
@@ -68,31 +68,31 @@ class Player {
       this->dir=0;      
       this->score=0;
     }
-    void draw(bool player1, bool WhiteOnBlack){
+    void draw(bool player1, bool WhiteOnBlack){ //todo keep only BoW
       int frame=WhiteOnBlack? 0:4;
-      frame+=dir;
+      frame+=(dir&0x0F);
       if (!player1){
         frame+=BETWEEN_ROBOTS;
       }
-      if (69!=dir){
+      if (ROBOT_DIED!=dir){
         Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, frame);
       }
       else
         Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, 2*BETWEEN_ROBOTS);
     }
-    void move(uint8_t direction){
+    void move(uint8_t direction, uint8_t distance){
       switch (direction){
         case HAUT:
-          y-=casesHeight;
+          y-=distance;
         break;
         case BAS:         
-          y+=casesHeight;
+          y+=distance;
         break;
         case DROITE:         
-          x+=casesLength;
+          x+=distance;
         break;
        case GAUCHE:
-          x-=casesLength;
+          x-=distance;
         break;
       }
     }
@@ -120,18 +120,32 @@ class Player {
       }
       return false;
     }
+    void init(bool player1){
+      if (player1){
+        dir=2;
+        x=1;
+      }
+      else {
+        dir=0;
+        x=71;
+      }      
+      y=31;
+      for (uint8_t i=0; i<NB_BOMB_MAX; i++){
+        bombs[i].counter=0;
+      }
+    }
 };
 
 class Player p1(1,31);
 class Player p2(71,31);
 
 
-bool controlRobot(void){ //check if arrow key is pressed, check if move is possible and then move
+void controlRobot(void){ //check if arrow key is pressed, check if move is possible and then move
   uint8_t dir=99;
   bool stay=true;
   //uint8_t walls=0;
   uint8_t temp;
-  uint8_t movesBack=movesLeft;
+  // uint8_t movesBack=movesLeft;
   Player* pp=&p2;
 
   if (p1Playing){
@@ -142,9 +156,10 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
   if (arduboy.justPressed(B_BUTTON)){ //B action (Bomb for now)    
     /*if (0==(tiles[temp].walls&0x0F)){
       tiles[temp].walls+=7; //todo define that*/
-    if (pp->placeBomb())
-      movesLeft--;
-    
+    if (pp->placeBomb()){
+      hold=true;
+      timer=HOLD_THRESHOLD-1;
+    }
   }
   else if (arduboy.justPressed(UP_BUTTON)){
     if (arduboy.pressed(A_BUTTON)){
@@ -154,7 +169,7 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
       dir=HAUT;      
       //if ((pp->y>=casesHeight)&&((walls&WALL_UP)!=WALL_UP)){
       if (canGoTo(temp,dir)){
-        pp->move(dir);
+        pp->move(dir, casesHeight);
         stay=false;
       }
     }
@@ -162,15 +177,16 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
   else if (arduboy.justPressed(DOWN_BUTTON)){
     if (arduboy.pressed(A_BUTTON)){
       //select weapon or just EoT...
-      movesLeft=0;
-      return true;
+      movesLeft=1; //because now "movesLeft-- is done outside this function
+      hold=true;
+      timer=HOLD_THRESHOLD-1;
     }
     else {
       dir=BAS;
       //if ((pp->y<((casesRow-1)*casesHeight))&&((walls&WALL_DOWN)!=WALL_DOWN)){
       if (canGoTo(temp,dir)){
         stay=false;
-        pp->move(dir);
+        pp->move(dir, casesHeight);
       }
     }
   }
@@ -179,14 +195,15 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
       if (0!=tiles[findInd(temp)].walls){
         tiles[findInd(temp)].turn(false);
         imposeWall(temp, true);
-        movesLeft--;
+        hold=true;      
+        timer=HOLD_THRESHOLD-1;
       }
     }
     else {
       dir=DROITE;
       //if (((pp->x<((casesCol-1)*casesLength))&&((walls&WALL_RIGHT)!=WALL_RIGHT))||((pp->x<0)&&(pp->y==31))){
       if (canGoTo(temp,dir)){
-        pp->move(dir);
+        pp->move(dir, casesLength);
         stay=false;        
       }
     }
@@ -196,14 +213,15 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
       if (0!=tiles[findInd(temp)].walls){
         tiles[findInd(temp)].turn(true);
         imposeWall(temp, true);
-        movesLeft--;
+        hold=true;
+        timer=HOLD_THRESHOLD-1;
       }
     }
     else {
       dir=GAUCHE;
       //if (((pp->x>=(casesLength))&&((walls&WALL_LEFT)!=WALL_LEFT))||((pp->x>70)&&(pp->y==31))){        
       if (canGoTo(temp,dir)){
-        pp->move(dir);
+        pp->move(dir, casesLength);
         stay=false;
       }
     }
@@ -211,20 +229,37 @@ bool controlRobot(void){ //check if arrow key is pressed, check if move is possi
   if (99!=dir){ //
     pp->dir=dir;
     if (false==stay){         
-      if (((p1.x==p2.x)&&(p1.y==p2.y))||((tiles[getIndice(pp->x,pp->y)].walls&0x07)>0)){        
-        dir+=2; //move back
-        if (dir>3)
-          dir-=4;
-        pp->move(dir);
+      if (((p1.x==p2.x)&&(p1.y==p2.y))||((tiles[getIndice(pp->x,pp->y)].walls&0x07)>0)){
+        //return false;    
       }
       else { //valid move
-        movesLeft--;
+        //movesLeft--; //inside checkMoving
+        pp->dir|=0x20; //adds a "moving timer"
+        hold=true;
+        timer=HOLD_THRESHOLD-2;
+        //return true;
       }
+      dir+=2; //move back
+      if (dir>3)
+        dir-=4;
+      pp->move(dir, casesLength); //just because length=height      
     }
   }
-  return(0!=(movesBack-movesLeft));
 }
 
+void checkMoving(void){
+  Player* pp=&p2; //or monster?
+
+  if (p1Playing){
+    pp=&p1;
+  }
+  uint8_t temp=(pp->dir&0xF0)>>4;
+  if (temp-->0){
+    pp->move(pp->dir&0x0F,5);
+    pp->dir&=0x0F;
+    pp->dir|=(temp<<4);  
+  }
+}
 void explode(uint8_t ind, uint8_t range){
   tiles[ind].walls=((tiles[ind].walls&0xF0)|WALL_EXPLOSION);
   int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1};

@@ -16,6 +16,7 @@
 #include "globals.h"
 #include "function.h" 
 #include "robot.h"
+#include "monster.h"
 
 #define NBGAMES 8
 
@@ -47,17 +48,19 @@ void mazeInit(void){
   cursX=50;
   cursY=8;
   randomTiles(20, SYMETRIC, true ); //sym //border
+  //todo random player starts
   movesLeft=movesInit/2;
+  p1.init(true);
+  p2.init(false);
+  hold=false;
 }
 void loop() { // -------------------------  Init loop -------------------------------------------------------------------------
-  //testP++; //for .h testing (doesn't work )
-  timer++;
-  //arduboy.pollButtons();  
-  
-  arduboy.clear(); 
+
   if (!(arduboy.nextFrame()))
     return;
     
+  arduboy.clear(); 
+  timer++;
   arduboy.pollButtons();    
     
   if (MENU==game){ 
@@ -151,24 +154,44 @@ void loop() { // -------------------------  Init loop --------------------------
   //SelectorManagment();
   //drawSelector(getIndice(cursX,cursY));
 
-  if (controlRobot()){ // check buttons and play robot's action
-    //ticks (robot has done one action)
-    if (checkBombs()){
-      timer=0;
-      if (WALL_EXPLOSION==(tiles[getIndice(p1.x,p1.y)].walls&WALL_EXPLOSION))
-        p1.dir=69;
-      if (WALL_EXPLOSION==(tiles[getIndice(p2.x,p2.y)].walls&WALL_EXPLOSION))
-        p2.dir=69;
+  if (!hold){    
+    controlRobot(); // check buttons and play robot's action    
+  }
+  else {
+    checkMoving();  
+    if (timer==HOLD_THRESHOLD){ //to prevent a player to play one move too much (and use one of his opponent's move)
+      hold=false;
+      //ticks (robot has done one action)    
+      if(--movesLeft==0){
+        movesLeft=movesInit;
+        p1Playing=!p1Playing;
+        hold=true;
+        timer+=3; //if changing turn, wait another few seconds
+      }
+      if (checkBombs()){        
+        hold=true;
+        if (WALL_EXPLOSION==(tiles[getIndice(monster.x,monster.y)].walls&WALL_EXPLOSION))
+          monster.dir=ROBOT_DIED;
+        if (WALL_EXPLOSION==(tiles[getIndice(p1.x,p1.y)].walls&WALL_EXPLOSION))
+          p1.dir=ROBOT_DIED;
+        if (WALL_EXPLOSION==(tiles[getIndice(p2.x,p2.y)].walls&WALL_EXPLOSION))
+          p2.dir=ROBOT_DIED;
+      }
+    }
+    else if (timer==HOLD_THRESHOLD+10){ //bomb has finished exploding 
+      if ((ROBOT_DIED!=p1.dir)&&(ROBOT_DIED!=p2.dir)){ //check if someone died
+        hold=false;
+      }
+    }
+    else if (timer>90){
+      mazeInit();
     }
   }
-  if(movesLeft==0){
-    movesLeft=movesInit;
-    p1Playing=!p1Playing;
-  }
+  monster.draw();
   p1.drawBombs();
   p2.drawBombs();
   p1.draw(true, WOB);  
-  p2.draw(false, WOB);    
+  p2.draw(false, WOB);  
   }
   
   else {

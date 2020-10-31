@@ -39,12 +39,12 @@ class Tile {
         arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,WOB);
       }
       if (WALL_EXPLOSION==(walls&WALL_EXPLOSION)){
-        if (timer<10)
-          arduboy.drawChar(x+2,y+1,'O',0,1,1); //"X" for nox
-        else if (timer<20)
-          arduboy.drawChar(x+2,y+1,'@',0,1,1); //"X" for nox
+        if (timer<(HOLD_THRESHOLD+5))
+          arduboy.drawChar(x+2,y+1,'O',0,1,1);
+        else if (timer<(HOLD_THRESHOLD+10))
+          arduboy.drawChar(x+2,y+1,'@',0,1,1);
         else {
-          walls&=0xF0;
+          walls&=0xF0; //clears the tile content
         }
       }
       /*
