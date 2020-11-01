@@ -33,7 +33,7 @@ Arduboy2 arduboy;
 //#define BLACK_STONE 1 // (P1)
 //#define WHITE_STONE 2 // (P2)
 #define HOLD_THRESHOLD 10
-#define ROBOT_DIED 0x0F
+#define DEAD 0x0F
 
 #define BETWEEN_ROBOTS 8 //Frame difference between Robot1 & Robot2
 #define WEAPON_MINE 0

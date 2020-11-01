@@ -158,9 +158,9 @@ void imposeWall(uint8_t ind, bool addAndRemove){
 
 void randomTiles (uint8_t randWall, bool sym, bool border){
   for (int i=0; i<NBTILES; i++){
-    tiles[i].i=i; //thatt's a whole bunch of i's...
+    tiles[i].i=i; //need this??
     uint8_t tw=0; //tiles[i].walls
-    if (sym&&(i%casesCol>=(casesCol/2))){ 
+    if (sym&&(i%casesCol>=(casesCol/2))){
       tw=tiles[i-2*(i%casesCol-casesCol/2)-1].walls;
       bool temp=tw&WALL_LEFT;  // méthode bête et méchante...
       bool temp2=tw&WALL_RIGHT;
@@ -176,15 +176,6 @@ void randomTiles (uint8_t randWall, bool sym, bool border){
           tw+=0x10;      
       }
     }
-    /*
-    if (sym&&(i%casesCol==(casesCol/2))){ 
-      if (tw&WALL_LEFT){
-        tw|=WALL_RIGHT;
-      }
-      else {
-        tw&=~(WALL_LEFT|WALL_RIGHT);
-      }
-    }*/
     tiles[i].walls=tw;
   }
   if (border){
@@ -194,8 +185,10 @@ void randomTiles (uint8_t randWall, bool sym, bool border){
           tiles[i].walls|=(0x10<<j);        
       }
     }
-    tiles[21].walls&=~WALL_LEFT;  //entrance
-    tiles[27].walls&=~WALL_RIGHT;
+    tiles[31].walls&=~WALL_LEFT;  //entrance
+    tiles[24].walls&=~WALL_RIGHT;
+    tiles[25].walls&=~WALL_LEFT;  //entrance
+    tiles[30].walls&=~WALL_RIGHT;
   }
   for (int i=0;i<NBTILES;i++){
     imposeWall(i, false);

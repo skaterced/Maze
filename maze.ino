@@ -44,12 +44,13 @@ void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup
 }
 
 void mazeInit(void){
-  randomSeed((int)timer*37);  
   cursX=50;
   cursY=8;
   randomTiles(20, SYMETRIC, true ); //sym //border
   //todo random player starts
   movesLeft=movesInit/2;
+  monster.dir=0;
+  monster.x=31;
   p1.init(true);
   p2.init(false);
   hold=false;
@@ -87,6 +88,7 @@ void loop() { // -------------------------  Init loop --------------------------
     {
       game=cursX;
       if (MAZE==game){
+        randomSeed((int)timer*37); 
         mazeInit();     
       }
     }
@@ -168,18 +170,21 @@ void loop() { // -------------------------  Init loop --------------------------
         hold=true;
         timer+=3; //if changing turn, wait another few seconds
       }
+      checkCollision();
+      monster.move();
+      checkCollision();
       if (checkBombs()){        
         hold=true;
         if (WALL_EXPLOSION==(tiles[getIndice(monster.x,monster.y)].walls&WALL_EXPLOSION))
-          monster.dir=ROBOT_DIED;
+          monster.dir=DEAD;
         if (WALL_EXPLOSION==(tiles[getIndice(p1.x,p1.y)].walls&WALL_EXPLOSION))
-          p1.dir=ROBOT_DIED;
+          p1.dir=DEAD;
         if (WALL_EXPLOSION==(tiles[getIndice(p2.x,p2.y)].walls&WALL_EXPLOSION))
-          p2.dir=ROBOT_DIED;
+          p2.dir=DEAD;
       }
     }
     else if (timer==HOLD_THRESHOLD+10){ //bomb has finished exploding 
-      if ((ROBOT_DIED!=p1.dir)&&(ROBOT_DIED!=p2.dir)){ //check if someone died
+      if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
         hold=false;
       }
     }

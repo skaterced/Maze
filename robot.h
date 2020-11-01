@@ -7,6 +7,7 @@
 #include "globals.h"
 #include "weapon.h"
 #include "function.h"
+//#include "monster.h"
 
 /*
 #define BETWEEN_ROBOTS 8 //Frame difference between Robot1 & Robot2
@@ -57,7 +58,7 @@ class Player {
     int x,y;
     uint8_t weapons; //0 means normal Bombs
     uint8_t range;
-    uint8_t dir; //if dir==ROBOT_DIED, direction heaven
+    uint8_t dir; //if dir==DEAD, direction heaven
     int score;
     Bomb bombs[3];
     Player(int X, int Y) {
@@ -74,7 +75,7 @@ class Player {
       if (!player1){
         frame+=BETWEEN_ROBOTS;
       }
-      if (ROBOT_DIED!=dir){
+      if (DEAD!=dir){
         Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, frame);
       }
       else
@@ -260,6 +261,7 @@ void checkMoving(void){
     pp->dir|=(temp<<4);  
   }
 }
+
 void explode(uint8_t ind, uint8_t range){
   tiles[ind].walls=((tiles[ind].walls&0xF0)|WALL_EXPLOSION);
   int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1};

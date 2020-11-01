@@ -80,7 +80,7 @@ void inGameMenu(bool test, int test1, int test2){
   arduboy.fillRect(x ,0,31,64,0);
   arduboy.setCursor(x,1);
   arduboy.print(F("Moves"));
-  arduboy.setCursor(x,10);
+  arduboy.setCursor(x+35,1);
   arduboy.print(movesLeft);
   if (test){
     arduboy.setCursor(x,30);
@@ -111,14 +111,14 @@ void inGameMenu(bool test, int test1, int test2){
       arduboy.print(F("Turn"));
     }
     else {
-      arduboy.setCursor(x,30);
+      arduboy.setCursor(x,20);
       arduboy.print(F("B for:"));
-      arduboy.setCursor(x+5,40);
+      arduboy.setCursor(x+5,30);
       arduboy.print(F("Bomb"));
+      arduboy.setCursor(x,45);
+      arduboy.print(F("hold A"));
       arduboy.setCursor(x,55);
-      arduboy.print(F("A+..."));
-      //arduboy.print(s);
-      //arduboy.print(F("EoT"));
+      arduboy.print(F("+..."));
     }
   }
 }
