@@ -155,11 +155,14 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   temp=getIndice(pp->x,pp->y);
   //walls=tiles[temp].walls;
   if (arduboy.justPressed(B_BUTTON)){ //B action (Bomb for now)    
-    /*if (0==(tiles[temp].walls&0x0F)){
-      tiles[temp].walls+=7; //todo define that*/
-    if (pp->placeBomb()){
+    if (arduboy.pressed(A_BUTTON)){
+      //secondary weapon (or switch weapon)
+    }
+    else {
+      if (pp->placeBomb()){
       hold=true;
       timer=HOLD_THRESHOLD-1;
+      }
     }
   }
   else if (arduboy.justPressed(UP_BUTTON)){

@@ -78,10 +78,6 @@ void inGameMenu(bool test, int test1, int test2){
       leftBorder-=(leftBorder-LEFTBORDERP2)/2;
   }
   arduboy.fillRect(x ,0,31,64,0);
-  arduboy.setCursor(x,1);
-  arduboy.print(F("Moves"));
-  arduboy.setCursor(x+35,1);
-  arduboy.print(movesLeft);
   if (test){
     arduboy.setCursor(x,30);
     arduboy.print(test1);
@@ -90,27 +86,29 @@ void inGameMenu(bool test, int test1, int test2){
   }
   else {
     if (arduboy.pressed(A_BUTTON)){
+      arduboy.drawChar(x,3,24,1,0,1);
+      arduboy.setCursor(x+5,3);
+      arduboy.print(F(": 2nd"));
+      arduboy.setCursor(x,12);
+      arduboy.print(F("weapon"));
       arduboy.drawChar(x,25,27,1,0,1);
       arduboy.drawChar(x+5,25,26,1,0,1);
       arduboy.setCursor(x+13,25);
       arduboy.print(F("Turn"));
       arduboy.setCursor(x,34);
       arduboy.print(F("Walls"));
-      /*
-      arduboy.drawChar(x,46,24,1,0,1);
-      arduboy.drawChar(x+5,47,25,1,0,1);    
-      arduboy.setCursor(x+13,47);
-      arduboy.print(F("SelB:"));
-      arduboy.setCursor(x,56);
-      arduboy.print(F("Weapon"));
-      */
+
       arduboy.drawChar(x,47,25,1,0,1);    
       arduboy.setCursor(x+5,47);
       arduboy.print(F(": End"));
       arduboy.setCursor(x+15,56);
       arduboy.print(F("Turn"));
     }
-    else {
+    else {      
+      arduboy.setCursor(x,1);
+      arduboy.print(F("Moves"));
+      arduboy.setCursor(x+35,1);
+      arduboy.print(movesLeft);
       arduboy.setCursor(x,20);
       arduboy.print(F("B for:"));
       arduboy.setCursor(x+5,30);

@@ -23,7 +23,7 @@ class Monster {
     void draw(void){
       if (DEAD!=dir){
         Sprites::drawOverwrite(x+leftBorder, y+upBorder, monstre_bitmap, 0);
-        if (3!=dir)
+        if (3!=(dir&0x0F))
           arduboy.drawPixel(x+3+leftBorder+((timer&0x10)>>4),y+4+upBorder,1);
         arduboy.drawPixel(x+2+leftBorder+((timer&0x08)>>3)*3,y+7+upBorder,1);
       }
@@ -32,34 +32,42 @@ class Monster {
       }        
     }
     void move(){
+      switch (dir&0x0F){
+        case HAUT:
+          y-=5;
+        break;
+        case BAS:         
+          y+=5;
+        break;
+        case DROITE:         
+          x+=5;
+        break;
+       case GAUCHE:
+          x-=5;
+        break;
+      }
+    }
+    void update(void){
       if (dir!=DEAD){
-        if ((dir&0x10)!=0){
-          //dir&=0xE0;
+        if ((dir&0xF0)==0){ //first step
+          hold=true;
           dir=random(4);
           for (uint8_t i=0;i<4;i++){
             if (canGoTo(getIndice(x,y),dir)){
-              switch (dir){
-                case HAUT:
-                  y-=10;
-                break;
-                case BAS:         
-                  y+=10;
-                break;
-                case DROITE:         
-                  x+=10;
-                break;
-               case GAUCHE:
-                  x-=10;
-                break;
-              }
+              move();
               break;
             }
             if(++dir>3)
               dir=0;
-          }        
-        }
-        else{
+          }
           dir|=0x10;
+        }
+        else if ((dir&0x30)==0x10){ //second step
+          move();
+          dir|=0x20;
+        }
+        else {
+          dir&=0x0F;
         }
       }
     }
@@ -67,7 +75,7 @@ class Monster {
 
 Monster monster=Monster(31,31);
 
-void checkCollision(void){ //between a robot and a monster
+void checkMonsterCollision(void){ //between a robot and a monster
   Player * pp;
   pp=&p1;
   for (uint8_t i=0;i<2;i++ ){

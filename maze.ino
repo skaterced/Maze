@@ -64,12 +64,21 @@ void loop() { // -------------------------  Init loop --------------------------
   timer++;
   arduboy.pollButtons();    
     
-  if (MENU==game){ 
+  if (MENU==game){
+    /*
     arduboy.drawChar(1,1,82,1,0,3); //ROBOT MAZE
     arduboy.drawChar(17,1,79,1,0,3);
     arduboy.drawChar(33,1,66,1,0,3);
     arduboy.drawChar(49,1,79,1,0,3);
     arduboy.drawChar(65,1,84,1,0,3);
+    */
+
+    arduboy.drawChar(1,1,66,1,0,3); //Bomber Maze
+    arduboy.drawChar(17,1,79,1,0,3);
+    arduboy.drawChar(33,1,77,1,0,3);
+    arduboy.drawChar(49,1,66,1,0,3);
+    arduboy.drawChar(65,1,69,1,0,3);
+    arduboy.drawChar(81,1,82,1,0,3);
     
     arduboy.drawChar(66,24,77,1,0,3);
     arduboy.drawChar(82,24,65,1,0,3);
@@ -170,9 +179,8 @@ void loop() { // -------------------------  Init loop --------------------------
         hold=true;
         timer+=3; //if changing turn, wait another few seconds
       }
-      checkCollision();
-      monster.move();
-      checkCollision();
+      checkMonsterCollision();
+      monster.update(); //initiate the monster movement      
       if (checkBombs()){        
         hold=true;
         if (WALL_EXPLOSION==(tiles[getIndice(monster.x,monster.y)].walls&WALL_EXPLOSION))
@@ -182,6 +190,10 @@ void loop() { // -------------------------  Init loop --------------------------
         if (WALL_EXPLOSION==(tiles[getIndice(p2.x,p2.y)].walls&WALL_EXPLOSION))
           p2.dir=DEAD;
       }
+    }
+    else if(timer==HOLD_THRESHOLD+1){
+      monster.update(); //finish the movement
+      checkMonsterCollision();
     }
     else if (timer==HOLD_THRESHOLD+10){ //bomb has finished exploding 
       if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
