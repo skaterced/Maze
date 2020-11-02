@@ -8,8 +8,9 @@ Arduboy2 arduboy;
 
 //todo clean those define
 #define MENU 0
-#define MENU2 1
-#define MAZE 4
+#define CREDIT 1
+#define MAZE 2
+#define OPTION 3
 #define WOB 0 //1 for White on Black... I think I'll stick to Black on White
 
 #define HAUT 3
@@ -71,7 +72,7 @@ int upBorder=2;
 //int adjSelectX=0; //no more other games... todo: clean
 //int adjSelectY=0;
 
-int cursX=4;
+int cursX=2;
 int cursY=30;
 uint8_t movesInit=4;
 uint8_t movesLeft=movesInit/2;
