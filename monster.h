@@ -11,7 +11,7 @@ const unsigned char PROGMEM monstre_bitmap[] = {
 
 class Monster {
   public :
-    int x,y;
+    uint8_t x,y;
     uint8_t dir;
     //uint8_t counter; // decreasing to 0 means exploding, then inactive  
     Monster(uint8_t x, uint8_t y) {
@@ -47,45 +47,122 @@ class Monster {
         break;
       }
     }
-    void update(void){
-      if (dir!=DEAD){
-        if ((dir&0xF0)==0){ //first step
-          hold=true;
-          dir=random(4);
-          for (uint8_t i=0;i<4;i++){
-            if (canGoTo(getIndice(x,y),dir)){
-              move();
-              break;
-            }
-            if(++dir>3)
-              dir=0;
-          }
-          dir|=0x10;
-        }
-        else if ((dir&0x30)==0x10){ //second step
+    bool firstStep(void){
+      dir=random(4);
+      for (uint8_t i=0;i<4;i++){
+        if (canGoTo(getIndice(x,y),dir,1)){
+          tiles[getIndice(x,y)].walls&=~TILE_MONSTER;
           move();
-          dir|=0x20;
+          dir|=0x10;
+          return true;
         }
-        else {
-          dir&=0x0F;
-        }
+        if(++dir>3)
+          dir=0;
       }
+      dir|=0x40; // couldn't move              
+      return false;
     }
 };
 
-Monster monster=Monster(31,31);
+//Monster monster=Monster(31,31);
+Monster monsters[2]={Monster(31,31),Monster(41,21)};
 
 void checkMonsterCollision(void){ //between a robot and a monster
   Player * pp;
   pp=&p1;
-  for (uint8_t i=0;i<2;i++ ){
-    if ((pp->x==monster.x)&&(pp->y==monster.y)&&(monster.dir!=DEAD)){
-      pp->dir|=DEAD;
-      hold=true;
+  for (uint8_t j=0;j<2;j++ ){
+    for (uint8_t i=0; i<NB_MONSTER_MAX; i++){  
+      if ((pp->x==monsters[i].x)&&(pp->y==monsters[i].y)&&(monsters[i].dir!=DEAD)){
+        pp->dir|=DEAD;
+        hold=true;
+      }
     }
     pp=&p2;
   }
 }
 
+bool controlMonsters(){  
+  bool alive=false;
+  uint8_t temp=0;
+  for (uint8_t i=0; i<NB_MONSTER_MAX; i++){    
+    if (monsters[i].dir!=DEAD){
+      temp=(monsters[i].dir&0xF0);
+      monsters[i].dir=(monsters[i].dir&0x0F);
+      alive=true;
+      if (0==temp){            
+        monsters[i].firstStep();        
+      }
+      else if (0x10==temp){
+        monsters[i].move(); //second step
+        tiles[getIndice(monsters[i].x,monsters[i].y)].walls|=TILE_MONSTER;
+        temp=(temp<<2);   
+        //|temp; //0x20;
+      }
+      else if (0x80==temp){
+        temp=0;  //monster now ready to move again
+        //return true;
+      }
+      else{
+        temp=(temp<<1);           
+      }
+      monsters[i].dir|=temp;
+    }
+  }
+  return alive;
+}
 
+/*
+bool controlMonsters(bool start){
+  if (start){
+    bool alive=false;
+    for (uint8_t i=0; i<NB_MONSTER_MAX; i++){    
+      if (monsters[i].dir!=DEAD){
+        alive=true;
+        if (monsters[i].firstStep()){
+          break;
+        }
+      }
+    }
+    return alive; // when start is true, if it returns false it means that every monsters are dead
+  }
+  else {
+    for (uint8_t i=0; i<NB_MONSTER_MAX; i++){   
+      if ((monsters[i].dir!=DEAD)&&(0x10==(monsters[i].dir&0x10))){
+        monsters[i].dir&=0xF0;
+        monsters[i].dir|=0x20;
+        monsters[i].move();
+        if ((NB_MONSTER_MAX-1)==i){
+          return true; //every monster has moved
+        }
+        else {
+          for (uint8_t j=i+1; j<NB_MONSTER_MAX; j++){
+            if (monsters[j].dir!=DEAD){
+              if (monsters[j].firstStep()){
+                return false; //not over yet
+              }
+            }
+          }          
+          return true;
+        }
+      }
+    }    
+  }
+}
+*/
+void monstersInit(void){
+  for (uint8_t i=0; i<NB_MONSTER_MAX; i++){
+    monsters[i].dir&=0;    
+  }
+  monsters[0].x=monsters[0].y=31;
+  monsters[1].x=41;
+  monsters[1].y=21;
+  tiles[getIndice(31,31)].walls|=TILE_MONSTER; //todo: add random placing
+  tiles[getIndice(21,41)].walls|=TILE_MONSTER;
+}
+
+void drawMonsters(){
+  for (uint8_t i=0; i<NB_MONSTER_MAX; i++){
+    monsters[i].draw();
+  }
+}
 #endif

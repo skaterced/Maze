@@ -6,7 +6,7 @@
 #include "tiles.h"
 //#include "robot.h"
 
-int getIndice(int x, int y){ //TO DO
+int getIndice(uint8_t x, uint8_t y){ //TO DO
   //arduboy.fillRect(x+1,y+1,7,10,fill);
   int temp=(x)/casesLength;
   temp+=(y)/casesHeight*casesCol;
@@ -53,10 +53,21 @@ void drawSelector(int i){
 }
 */
 
-bool canGoTo(uint8_t ind, uint8_t direction){
+bool canGoTo(uint8_t ind, uint8_t direction, uint8_t what){ //what: 0:Robot, 1: monster, 2:explosion
   //check if there is no wall (or border) from tiles[ind] to tiles[voisin(ind, direction)]
-  if (-1!=voisin(ind, direction)){
+  int temp=voisin(ind, direction);
+  if (-1!=temp){
     if (0==(tiles[ind].walls&(0x10<<direction))){
+      if (TILE_BOMB==(tiles[temp].walls&TILE_BOMB)){
+        if (2==what)
+          return true;
+        return false;
+      }
+      if (TILE_MONSTER==(tiles[temp].walls&TILE_MONSTER)){
+        if (1==what)
+          return false;
+        return true;
+      }
       return true;
     }
   }
@@ -104,11 +115,13 @@ void inGameMenu(bool test, int test1, int test2){
       arduboy.setCursor(x+15,56);
       arduboy.print(F("Turn"));
     }
-    else {      
-      arduboy.setCursor(x,1);
-      arduboy.print(F("Moves"));
-      arduboy.setCursor(x+35,1);
-      arduboy.print(movesLeft);
+    else {
+      if (twoPlayersMode){
+        arduboy.setCursor(x,1);
+        arduboy.print(F("Moves"));
+        arduboy.setCursor(x+35,1);
+        arduboy.print(movesLeft);
+      }
       arduboy.setCursor(x,20);
       arduboy.print(F("B for:"));
       arduboy.setCursor(x+5,30);

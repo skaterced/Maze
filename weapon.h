@@ -5,7 +5,7 @@
 
 class Bomb {
   public :
-    int x,y;
+    uint8_t x,y;
     uint8_t range;
     uint8_t counter; // decreasing to 0 means exploding, then inactive  
     Bomb(void) {

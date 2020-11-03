@@ -21,10 +21,10 @@ Arduboy2 arduboy;
 #define WALL_RIGHT 0x40
 #define WALL_DOWN 0x20
 #define WALL_LEFT 0x10
-#define WALL_EXPLOSION 0x08
-#define WALL_OQP 0x04
-#define WALL_BLOCK 0x02
-#define WALL_SOLID_BLOCK 0x01
+#define TILE_EXPLODING 0x08
+#define TILE_BOMB 0x04
+#define TILE_MONSTER 0x02
+#define TILE_TBD 0x01
 #define SYMETRIC true
 #define NBTILES 48//casesCol*casesRow
 #define LEFTBORDERP1 46
@@ -42,6 +42,7 @@ Arduboy2 arduboy;
 
 #define BOMB_RANGE_MAX 3
 #define NB_BOMB_MAX 3
+#define NB_MONSTER_MAX 2
 #define BOMB_DEFAULT_T 9
 
 /*
@@ -57,9 +58,10 @@ uint8_t difficulty=2;  //must be between 1-4
 uint8_t game=MENU;
 //int temp=0;
 bool p1Playing=true; //false: p2's turn
-bool selected=false; //MILL and MEMO - when a player has selected something - ReflX True: bold arrow
-int8_t selectedI=-1;
-bool removing=false;
+bool twoPlayersMode = true;
+//bool selected=false; //MILL and MEMO - when a player has selected something - ReflX True: bold arrow
+//int8_t selectedI=-1;
+//bool removing=false;
 //bool blink=true;
 //uint8_t blinkTimer=BLINK_TIMER_INIT;
 uint8_t casesLength=10;
@@ -76,6 +78,7 @@ int cursX=2;
 int cursY=30;
 uint8_t movesInit=4;
 uint8_t movesLeft=movesInit/2;
+bool monstersMoved = false;
 //uint8_t stoneArray [81];
 
 

@@ -55,13 +55,13 @@ const unsigned char robots[] PROGMEM = {
 
 class Player {
   public :
-    int x,y;
+    uint8_t x,y; //could this be uint8_t ?
     uint8_t weapons; //0 means normal Bombs
     uint8_t range;
     uint8_t dir; //if dir==DEAD, direction heaven
-    int score;
+    uint8_t score;
     Bomb bombs[3];
-    Player(int X, int Y) {
+    Player(uint8_t X, uint8_t Y) {
       this->x=X;
       this->y=Y;
       this->weapons=0;  //
@@ -70,7 +70,7 @@ class Player {
       this->score=0;
     }
     void draw(bool player1, bool WhiteOnBlack){ //todo keep only BoW
-      int frame=WhiteOnBlack? 0:4;
+      uint8_t frame=WhiteOnBlack? 0:4;
       frame+=(dir&0x0F);
       if (!player1){
         frame+=BETWEEN_ROBOTS;
@@ -98,24 +98,24 @@ class Player {
       }
     }
     void drawBombs(void){
-      for (int i=0; i<NB_BOMB_MAX; i++){
+      for (uint8_t i=0; i<NB_BOMB_MAX; i++){
         if (bombs[i].counter!=0){
           bombs[i].draw();
         }
       }
     }
     bool placeBomb(void){
-      for (int i=0; i<NB_BOMB_MAX; i++){ // check if place is bomb free
+      for (uint8_t i=0; i<NB_BOMB_MAX; i++){ // check if place is bomb free
         if ((0!=bombs[i].counter)&&(bombs[i].x==x)&&(bombs[i].y==y)){
           return false;
         }
       }      
-      for (int i=0; i<NB_BOMB_MAX; i++){
+      for (uint8_t i=0; i<NB_BOMB_MAX; i++){
         if (0==bombs[i].counter){
           bombs[i].x=x;
           bombs[i].y=y;
           bombs[i].counter=BOMB_DEFAULT_T;
-          tiles[getIndice(x,y)].walls|=WALL_OQP;
+          tiles[getIndice(x,y)].walls|=TILE_BOMB;
           return true;
         }
       }
@@ -172,7 +172,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
     else {
       dir=HAUT;      
       //if ((pp->y>=casesHeight)&&((walls&WALL_UP)!=WALL_UP)){
-      if (canGoTo(temp,dir)){
+      if (canGoTo(temp,dir,0)){
         pp->move(dir, casesHeight);
         stay=false;
       }
@@ -188,7 +188,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
     else {
       dir=BAS;
       //if ((pp->y<((casesRow-1)*casesHeight))&&((walls&WALL_DOWN)!=WALL_DOWN)){
-      if (canGoTo(temp,dir)){
+      if (canGoTo(temp,dir,0)){
         stay=false;
         pp->move(dir, casesHeight);
       }
@@ -196,8 +196,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   }
   else if (arduboy.justPressed(RIGHT_BUTTON)){
     if (arduboy.pressed(A_BUTTON)){
-      if (0!=tiles[findInd(temp)].walls){
-        tiles[findInd(temp)].turn(false);
+      if (0!=tiles[temp].walls){
+        tiles[temp].turn(false);
         imposeWall(temp, true);
         hold=true;      
         timer=HOLD_THRESHOLD-1;
@@ -206,7 +206,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
     else {
       dir=DROITE;
       //if (((pp->x<((casesCol-1)*casesLength))&&((walls&WALL_RIGHT)!=WALL_RIGHT))||((pp->x<0)&&(pp->y==31))){
-      if (canGoTo(temp,dir)){
+      if (canGoTo(temp,dir,0)){
         pp->move(dir, casesLength);
         stay=false;        
       }
@@ -214,8 +214,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   }
   else if (arduboy.justPressed(LEFT_BUTTON)){
     if (arduboy.pressed(A_BUTTON)){
-      if (0!=tiles[findInd(temp)].walls){
-        tiles[findInd(temp)].turn(true);
+      if (0!=tiles[temp].walls){
+        tiles[temp].turn(true);
         imposeWall(temp, true);
         hold=true;
         timer=HOLD_THRESHOLD-1;
@@ -224,7 +224,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
     else {
       dir=GAUCHE;
       //if (((pp->x>=(casesLength))&&((walls&WALL_LEFT)!=WALL_LEFT))||((pp->x>70)&&(pp->y==31))){        
-      if (canGoTo(temp,dir)){
+      if (canGoTo(temp,dir,0)){
         pp->move(dir, casesLength);
         stay=false;
       }
@@ -233,7 +233,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   if (99!=dir){ //
     pp->dir=dir;
     if (false==stay){         
-      if (((p1.x==p2.x)&&(p1.y==p2.y))||((tiles[getIndice(pp->x,pp->y)].walls&0x07)>0)){
+      if ((p1.x==p2.x)&&(p1.y==p2.y)){//||((tiles[getIndice(pp->x,pp->y)].walls&0x07)>0)){
         //return false;    
       }
       else { //valid move
@@ -266,19 +266,19 @@ void checkMoving(void){
 }
 
 void explode(uint8_t ind, uint8_t range){
-  tiles[ind].walls=((tiles[ind].walls&0xF0)|WALL_EXPLOSION);
+  tiles[ind].walls=((tiles[ind].walls&0xF0)|TILE_EXPLODING);
   int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1};
   if (range>BOMB_RANGE_MAX)
     range=BOMB_RANGE_MAX;
-  for (int j=0; j<4; j++){ //explode in all directions
-    for (int i=0; i<range; i++){
-      if (canGoTo(temp[i],j)){
+  for (uint8_t j=0; j<4; j++){ //explode in all directions
+    for (uint8_t i=0; i<range; i++){
+      if (canGoTo(temp[i],j,2)){
         temp[i+1]=voisin(temp[i],j);
         if (-1!=temp[i+1]){
           if ((tiles[temp[i+1]].walls&0x07)>0){
             explode(temp[i+1],range);
           }
-          tiles[temp[i+1]].walls=((tiles[temp[i+1]].walls&0xF0)|WALL_EXPLOSION);
+          tiles[temp[i+1]].walls=((tiles[temp[i+1]].walls&0xF0)|TILE_EXPLODING);
         }
         else break;
       }
@@ -303,9 +303,9 @@ bool checkBombs(void){
   }
   if (boom){ //check if there's a chain reaction
     for (uint8_t j=0;j<2;j++){
-      for (int i=0; i<NB_BOMB_MAX; i++){
+      for (uint8_t i=0; i<NB_BOMB_MAX; i++){
         if (0!=pp->bombs[i].counter){
-          if ((tiles[getIndice(pp->bombs[i].x,pp->bombs[i].y)].walls&WALL_EXPLOSION)==WALL_EXPLOSION){
+          if ((tiles[getIndice(pp->bombs[i].x,pp->bombs[i].y)].walls&TILE_EXPLODING)==TILE_EXPLODING){
             explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);
             pp->bombs[i].counter=0;
             i=0; // because it might have triggered another...
