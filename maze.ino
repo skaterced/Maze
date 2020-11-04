@@ -31,9 +31,9 @@ void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup
 }
 
 void mazeInit(void){
-  cursX=50;
+  cursX=50;//need curs?
   cursY=8;
-  randomTiles(20, SYMETRIC, true ); //sym //border
+  randomTiles(20, twoPlayersMode, true ); //symmetric if 2P //border
   //todo random player starts
   movesLeft=movesInit/2;
   //monster.dir=0;  Todo reInit monsters
@@ -77,8 +77,7 @@ void loop() { // -------------------------  Init loop --------------------------
   */
   inGameMenu(false, 0,0); //"test mode" if true
   
-  if (0==WOB)
-    arduboy.fillRect(leftBorder-2,0,84,64,1);
+  arduboy.fillRect(leftBorder-2,0,84,64,1);
 
   drawTiles();
 
@@ -117,7 +116,12 @@ void loop() { // -------------------------  Init loop --------------------------
         }
       }
       else
-        controlMonsters(); //todo check if false (all monsters dead)
+        if (!controlMonsters()){ //check if false (all monsters dead)
+          if (nbMonstersPlaying<NB_MONSTER_MAX){
+            nbMonstersPlaying++;
+          }
+          mazeInit();
+        }
       /*
       checkMonsterCollision();
       if (!monstersMoved){
@@ -132,15 +136,16 @@ void loop() { // -------------------------  Init loop --------------------------
     }
     else if(timer==HOLD_THRESHOLD+1){
       controlMonsters();
-      checkMonsterCollision();
-      if((--movesLeft==0)&&(twoPlayersMode)){  //if changing turn, wait another few seconds
-        movesLeft=movesInit;
-        p1Playing=!p1Playing;
-        timer+=3;
-      }
-      else {
-        timer+=8;
-        //hold=false;
+      if (!checkMonsterCollision()){
+        if((--movesLeft==0)&&(twoPlayersMode)){  //if changing turn, wait another few seconds
+          movesLeft=movesInit;
+          p1Playing=!p1Playing;
+          timer+=3;
+        }
+        else {
+          timer+=8;
+          //hold=false;
+        }
       }
     }
     else if (timer==HOLD_THRESHOLD+10){ //bomb has finished exploding 
@@ -156,9 +161,9 @@ void loop() { // -------------------------  Init loop --------------------------
   p1.drawBombs();
   if (twoPlayersMode){
     p2.drawBombs();
-    p2.draw(false, WOB);
+    p2.draw(false);
   }
-  p1.draw(true, WOB);  
+  p1.draw(true);  
   }
   
   else {

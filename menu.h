@@ -101,8 +101,8 @@ bool mainMenu(void) {
   
 void optionMenu(void){      
   arduboy.setCursor(10,10);
-  arduboy.print("Difficulty : ");
-  arduboy.print(difficulty);
+  arduboy.print(F("Starting Lvl :"));
+//  arduboy.print(difficulty);
   arduboy.setCursor(10,20);
   arduboy.print("Controls : " );
 //    arduboy.print(forEmulator ? "PC":"Arduboy");
@@ -131,8 +131,8 @@ void optionMenu(void){
     switch (cursY){
       case 0:
       
-        if (++difficulty==5)
-          difficulty=1;
+//        if (++difficulty==5)
+//          difficulty=1;
       break;
     }
     

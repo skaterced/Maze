@@ -55,20 +55,20 @@ void drawTiles(void){
     x= leftBorder + (i%casesCol)*casesLength;
     y= upBorder + i/casesCol*casesHeight;//+upBorder+2;
     if (WALL_UP==(tiles[i].walls&WALL_UP)){
-      arduboy.drawLine(x,y,x+casesLength-1,y,WOB);
-      arduboy.drawLine(x,y-1,x+casesLength-1,y-1,WOB);
+      arduboy.drawLine(x,y,x+casesLength-1,y,0);
+      arduboy.drawLine(x,y-1,x+casesLength-1,y-1,0);
     }
     if (WALL_DOWN==(tiles[i].walls&WALL_DOWN)){
-      arduboy.drawLine(x,y+casesHeight-1,x+casesLength-1,y+casesHeight-1,WOB);
-      arduboy.drawLine(x,y+casesHeight,x+casesLength-1,y+casesHeight,WOB);
+      arduboy.drawLine(x,y+casesHeight-1,x+casesLength-1,y+casesHeight-1,0);
+      arduboy.drawLine(x,y+casesHeight,x+casesLength-1,y+casesHeight,0);
     }      
     if (WALL_RIGHT==(tiles[i].walls&WALL_RIGHT)){
-      arduboy.drawLine(x+casesLength-1,y,x+casesLength-1,y+casesHeight-1,WOB);
-      arduboy.drawLine(x+casesLength,y,x+casesLength,y+casesHeight-1,WOB);
+      arduboy.drawLine(x+casesLength-1,y,x+casesLength-1,y+casesHeight-1,0);
+      arduboy.drawLine(x+casesLength,y,x+casesLength,y+casesHeight-1,0);
     }
     if (WALL_LEFT==(tiles[i].walls&WALL_LEFT)){
-      arduboy.drawLine(x,y,x,y+casesHeight-1,WOB);
-      arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,WOB);
+      arduboy.drawLine(x,y,x,y+casesHeight-1,0);
+      arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,0);
     }
     if (TILE_EXPLODING==(tiles[i].walls&TILE_EXPLODING)){
       if (timer<(HOLD_THRESHOLD+5))

@@ -11,7 +11,7 @@ Arduboy2 arduboy;
 #define CREDIT 1
 #define MAZE 2
 #define OPTION 3
-#define WOB 0 //1 for White on Black... I think I'll stick to Black on White
+//#define 0 0 //1 for White on Black... I think I'll stick to Black on White
 
 #define HAUT 3
 #define DROITE 2
@@ -36,13 +36,13 @@ Arduboy2 arduboy;
 #define HOLD_THRESHOLD 10
 #define DEAD 0x0F
 
-#define BETWEEN_ROBOTS 8 //Frame difference between Robot1 & Robot2
+#define BETWEEN_ROBOTS 5 //Frame difference between Robot1 & Robot2
 #define WEAPON_MINE 0
 #define WEAPON_PUNCH 1
 
 #define BOMB_RANGE_MAX 3
 #define NB_BOMB_MAX 3
-#define NB_MONSTER_MAX 2
+#define NB_MONSTER_MAX 4
 #define BOMB_DEFAULT_T 9
 
 /*
@@ -54,16 +54,11 @@ const char* weaponList[] PROGMEM = {
 //uint8_t scoreTimer=0;
 uint8_t timer=0;
 bool hold=false;
-uint8_t difficulty=2;  //must be between 1-4
+//uint8_t difficulty=2;  //must be between 1-4
 uint8_t game=MENU;
 //int temp=0;
 bool p1Playing=true; //false: p2's turn
 bool twoPlayersMode = true;
-//bool selected=false; //MILL and MEMO - when a player has selected something - ReflX True: bold arrow
-//int8_t selectedI=-1;
-//bool removing=false;
-//bool blink=true;
-//uint8_t blinkTimer=BLINK_TIMER_INIT;
 uint8_t casesLength=10;
 uint8_t casesHeight=10;
 uint8_t casesCol=8;
@@ -79,6 +74,7 @@ int cursY=30;
 uint8_t movesInit=4;
 uint8_t movesLeft=movesInit/2;
 bool monstersMoved = false;
+uint8_t nbMonstersPlaying=1;
 //uint8_t stoneArray [81];
 
 
