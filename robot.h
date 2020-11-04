@@ -104,17 +104,14 @@ class Player {
         }
       }
     }
-    bool placeBomb(void){
-      for (uint8_t i=0; i<NB_BOMB_MAX; i++){ // check if place is bomb free
-        if ((0!=bombs[i].counter)&&(bombs[i].x==x)&&(bombs[i].y==y)){
-          return false;
-        }
-      }      
+    bool placeBomb(void){  
+      if ((tiles[getIndice(x,y)].walls&TILE_BOMB)==TILE_BOMB)
+        return false;
       for (uint8_t i=0; i<NB_BOMB_MAX; i++){
         if (0==bombs[i].counter){
           bombs[i].x=x;
           bombs[i].y=y;
-          bombs[i].counter=BOMB_DEFAULT_T;
+          bombs[i].counter=(twoPlayersMode? BOMB_DEFAULT_T : BOMB_DEFAULT_T-3);
           tiles[getIndice(x,y)].walls|=TILE_BOMB;
           return true;
         }

@@ -3,7 +3,7 @@
 
 #include "globals.h"
 #include "robot.h"
-#define MENU_SCROLL 120
+#define MENU_SCROLL 254
 
 bool mainMenu(void) {
   /*
@@ -22,6 +22,13 @@ bool mainMenu(void) {
     hold=true;
   }
   
+  if ((!hold)&&(timer<=MENU_SCROLL-25)){
+    arduboy.setCursor(22,15);
+    arduboy.print(F("C" "\x82" "dric Martin\n"));
+    arduboy.setCursor(39,25);
+    arduboy.print(F("present"));    
+  }
+  
   arduboy.drawChar(scroll+66,25,77,1,0,3);
   arduboy.drawChar(scroll+82,25,65,1,0,3);
   arduboy.drawChar(scroll+98,25,90,1,0,3);
@@ -36,10 +43,20 @@ bool mainMenu(void) {
   arduboy.drawChar(scroll+65,1,69,1,0,3);
   arduboy.drawChar(scroll+81,1,82,1,0,3);
 
-  if (hold){   
+  if (hold){
     arduboy.setCursor(0,55);
     switch (cursX){
       case 1:
+        arduboy.print(F("      1P Start  ->"));
+        break;
+      case 2:
+        arduboy.print(F("  <-  2P Start  ->"));
+        break;
+      case 3:
+        arduboy.print(F("  <-  Option"));  
+        break;
+/*
+       case 1:
         arduboy.print(F("       Credit -> Star"));
         break;
       case 2:
@@ -48,6 +65,7 @@ bool mainMenu(void) {
       case 3:
         arduboy.print(F("tart <- Option"));  
         break;
+ */
     }
   }
   
@@ -65,7 +83,11 @@ bool mainMenu(void) {
   {
     if (hold){
       game=cursX;
-      if (MAZE==game){
+      if (game<3){
+        if (1==game){
+          game=2;
+          twoPlayersMode=false;
+        }
         randomSeed((int)timer*37); 
         return true;     
       }
