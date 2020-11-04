@@ -3,6 +3,7 @@
 
 #include "globals.h"
 #include "robot.h"
+#define MENU_SCROLL 120
 
 bool mainMenu(void) {
   /*
@@ -12,30 +13,42 @@ bool mainMenu(void) {
   arduboy.drawChar(49,1,79,1,0,3);
   arduboy.drawChar(65,1,84,1,0,3);
   */
+  int scroll;
+  if ((timer<=MENU_SCROLL)&&(false==hold)){
+    scroll=timer-MENU_SCROLL;
+  }
+  else {
+    scroll=0;
+    hold=true;
+  }
+  
+  arduboy.drawChar(scroll+66,25,77,1,0,3);
+  arduboy.drawChar(scroll+82,25,65,1,0,3);
+  arduboy.drawChar(scroll+98,25,90,1,0,3);
+  arduboy.drawChar(scroll+114,25,69,1,0,3);
 
-  arduboy.drawChar(1,1,66,1,0,3); //Bomber Maze
-  arduboy.drawChar(17,1,79,1,0,3);
-  arduboy.drawChar(33,1,77,1,0,3);
-  arduboy.drawChar(49,1,66,1,0,3);
-  arduboy.drawChar(65,1,69,1,0,3);
-  arduboy.drawChar(81,1,82,1,0,3);
-  
-  arduboy.drawChar(66,24,77,1,0,3);
-  arduboy.drawChar(82,24,65,1,0,3);
-  arduboy.drawChar(98,24,90,1,0,3);
-  arduboy.drawChar(114,24,69,1,0,3);
-  
-  arduboy.setCursor(0,55);
-  switch (cursX){
-    case 1:
-      arduboy.print(F("       Credit -> Star"));
-      break;
-    case 2:
-      arduboy.print(F("edit <- Start -> Opti"));
-      break;
-    case 3:
-      arduboy.print(F("tart <- Option"));  
-      break;
+  scroll*=-1;
+
+  arduboy.drawChar(scroll+1,1,66,1,0,3); //Bomber Maze
+  arduboy.drawChar(scroll+17,1,79,1,0,3);
+  arduboy.drawChar(scroll+33,1,77,1,0,3);
+  arduboy.drawChar(scroll+49,1,66,1,0,3);
+  arduboy.drawChar(scroll+65,1,69,1,0,3);
+  arduboy.drawChar(scroll+81,1,82,1,0,3);
+
+  if (hold){   
+    arduboy.setCursor(0,55);
+    switch (cursX){
+      case 1:
+        arduboy.print(F("       Credit -> Star"));
+        break;
+      case 2:
+        arduboy.print(F("edit <- Start -> Opti"));
+        break;
+      case 3:
+        arduboy.print(F("tart <- Option"));  
+        break;
+    }
   }
   
   if (arduboy.justPressed(LEFT_BUTTON))
@@ -50,10 +63,15 @@ bool mainMenu(void) {
   }    
   if (arduboy.justPressed(A_BUTTON))
   {
-    game=cursX;
-    if (MAZE==game){
-      randomSeed((int)timer*37); 
-      return true;     
+    if (hold){
+      game=cursX;
+      if (MAZE==game){
+        randomSeed((int)timer*37); 
+        return true;     
+      }
+    }
+    else {
+      hold=true;
     }
   }
   return false;

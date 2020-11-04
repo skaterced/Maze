@@ -1,4 +1,4 @@
-/*  Welcome to  ** Robot Maze **. It might still evolve but for now it is a 2 players turn based Bomberman 
+/*  Welcome to  ** Bomber Maze **. It might still evolve but for now it is a 2 players turn based Bomberman 
  *      
       Menu:
         To be defined
