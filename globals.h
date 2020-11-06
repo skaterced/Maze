@@ -25,6 +25,10 @@ Arduboy2 arduboy;
 #define TILE_BOMB 0x04
 #define TILE_MONSTER 0x02
 #define TILE_TBD 0x01
+#define ROBOT 0
+#define MONSTER 1
+#define EXPLOSION 2
+
 #define SYMETRIC true
 #define NBTILES 48//casesCol*casesRow
 #define LEFTBORDERP1 46
@@ -42,7 +46,7 @@ Arduboy2 arduboy;
 
 #define BOMB_RANGE_MAX 3
 #define NB_BOMB_MAX 3
-#define NB_MONSTER_MAX 4
+#define NB_MONSTER_MAX 10
 #define BOMB_DEFAULT_T 9
 
 /*
@@ -74,7 +78,7 @@ int cursY=30;
 uint8_t movesInit=4;
 uint8_t movesLeft=movesInit/2;
 bool monstersMoved = false;
-uint8_t nbMonstersPlaying=1;
+uint8_t nbMonstersPlaying=7;
 //uint8_t stoneArray [81];
 
 

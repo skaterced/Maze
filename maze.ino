@@ -69,101 +69,85 @@ void loop() { // -------------------------  Init loop --------------------------
   }
   
   else if (MAZE==game){  // _____________________|     |___________| Maze |___________|    |______________________________|
-    //arduboy.clear();
-  /* //test
-  p1.score=monsters[0].dir;
-  p2.score=monsters[1].dir;   
-  inGameMenu(true, p1.score, p2.score); //"test mode" if true
-  */
-  inGameMenu(false, 0,0); //"test mode" if true
+      //arduboy.clear();
+    /* //test
+    p1.score=monsters[0].dir;
+    p2.score=monsters[1].dir;   
+    inGameMenu(true, p1.score, p2.score); //"test mode" if true
+    */
+    inGameMenu(false, 0,0); //"test mode" if true
+    
+    arduboy.fillRect(leftBorder-2,0,84,64,1);
   
-  arduboy.fillRect(leftBorder-2,0,84,64,1);
-
-  drawTiles();
-
-  //SelectorManagment();
-  //drawSelector(getIndice(cursX,cursY));
-
-  if (!hold){    
-    controlRobot(); // check buttons and play robot's action    
-  }
-  else {
-    checkMoving();
-    /*
-    if (controlMonsters(false)){ //finished moving monsters
-      checkMonsterCollision();
-      clearMonstersDir();
-    }*/
-    if (timer==HOLD_THRESHOLD){ //to prevent a player to play one move too much (and use one of his opponent's move)
-      //hold=false;
-      //ticks (robot has done one action)    
-      
-      if (checkBombs()){        
-        //hold=true;
-        for (uint8_t i=0; i<NB_MONSTER_MAX; i++){
-          if (TILE_EXPLODING==(tiles[getIndice(monsters[i].x,monsters[i].y)].walls&TILE_EXPLODING))
-            monsters[i].dir=DEAD;
-        }
-        if (TILE_EXPLODING==(tiles[getIndice(p1.x,p1.y)].walls&TILE_EXPLODING))
-          p1.dir=DEAD;
-        if (TILE_EXPLODING==(tiles[getIndice(p2.x,p2.y)].walls&TILE_EXPLODING))
-          p2.dir=DEAD;
-        timer++; //skip a monster's turn
-        if((--movesLeft==0)&&(twoPlayersMode)){  //retest because of the bomb skip...
-          movesLeft=movesInit;
-          p1Playing=!p1Playing;
-          //timer+=3;
-        }
-      }
-      else
-        if (!controlMonsters()){ //check if false (all monsters dead)
-          if (nbMonstersPlaying<NB_MONSTER_MAX){
-            nbMonstersPlaying++;
+    drawTiles();
+  
+    //SelectorManagment();
+    //drawSelector(getIndice(cursX,cursY));
+  
+    if (!hold){    
+      controlRobot(); // check buttons and play robot's action    
+    }
+    else {
+      checkMoving();
+      if (timer==HOLD_THRESHOLD){ //to prevent a player to play one move too much (and use one of his opponent's move)
+        //hold=false;
+        //ticks (robot has done one action)    
+        
+        if (checkBombs()){        
+          //hold=true;
+          for (uint8_t i=0; i<nbMonstersPlaying; i++){
+            if (TILE_EXPLODING==(tiles[getIndice(monsters[i].x,monsters[i].y)].walls&TILE_EXPLODING))
+              monsters[i].dir=DEAD;
           }
-          mazeInit();
+          if (TILE_EXPLODING==(tiles[getIndice(p1.x,p1.y)].walls&TILE_EXPLODING))
+            p1.dir=DEAD;
+          if (TILE_EXPLODING==(tiles[getIndice(p2.x,p2.y)].walls&TILE_EXPLODING))
+            p2.dir=DEAD;
+          timer++; //skip a monster's turn
+          if((--movesLeft==0)&&(twoPlayersMode)){  //retest because of the bomb skip...
+            movesLeft=movesInit;
+            p1Playing=!p1Playing;
+            //timer+=3;
+          }
         }
-      /*
-      checkMonsterCollision();
-      if (!monstersMoved){
-        if (!controlMonsters(true)){ //initiate the monsters movement              
-          //
-        }
-        monstersMoved=true;
+        else
+          if (!controlMonsters()){ //check if false (all monsters dead)
+            if (nbMonstersPlaying<NB_MONSTER_MAX){
+              nbMonstersPlaying++;
+            }
+            mazeInit();
+          }
       }
-      else {
-        monstersMoved=false; //monsters move every 2 ticks
-      }*/
-    }
-    else if(timer==HOLD_THRESHOLD+1){
-      controlMonsters();
-      if (!checkMonsterCollision()){
-        if((--movesLeft==0)&&(twoPlayersMode)){  //if changing turn, wait another few seconds
-          movesLeft=movesInit;
-          p1Playing=!p1Playing;
-          timer+=3;
-        }
-        else {
-          timer+=8;
-          //hold=false;
+      else if(timer==HOLD_THRESHOLD+1){
+        controlMonsters();
+        if (!checkMonsterCollision()){
+          if((--movesLeft==0)&&(twoPlayersMode)){  //if changing turn, wait another few seconds
+            movesLeft=movesInit;
+            p1Playing=!p1Playing;
+            timer+=3;
+          }
+          else {
+            timer+=8;
+            //hold=false;
+          }
         }
       }
-    }
-    else if (timer==HOLD_THRESHOLD+10){ //bomb has finished exploding 
-      if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
-        hold=false;
+      else if (timer==HOLD_THRESHOLD+10){ //bomb has finished exploding 
+        if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
+          hold=false;
+        }
+      }
+      else if (timer>90){
+        mazeInit();
       }
     }
-    else if (timer>90){
-      mazeInit();
+    drawMonsters();
+    p1.drawBombs();
+    if (twoPlayersMode){
+      p2.drawBombs();
+      p2.draw(false);
     }
-  }
-  drawMonsters();
-  p1.drawBombs();
-  if (twoPlayersMode){
-    p2.drawBombs();
-    p2.draw(false);
-  }
-  p1.draw(true);  
+    p1.draw(true);  
   }
   
   else {

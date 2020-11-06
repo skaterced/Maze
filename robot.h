@@ -23,7 +23,7 @@ const char* weaponList[] PROGMEM = {
 };
 */
 
-const unsigned char robots[] PROGMEM = {
+const unsigned char robots_bitmap[] PROGMEM = {
 // width, height,
 8, 8,
 //0
@@ -85,14 +85,14 @@ class Player {
         frame+=BETWEEN_ROBOTS;
       }
       if (DEAD!=dir){
-        Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, frame);          
+        Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots_bitmap, frame);          
       }
       else {
         if (timer<(HOLD_THRESHOLD+9)){
-          Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, (player1?  1:2)*BETWEEN_ROBOTS-1);
+          Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots_bitmap, (player1?  1:2)*BETWEEN_ROBOTS-1);
         }
         else {      
-          Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots, 2*BETWEEN_ROBOTS);
+          Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots_bitmap, 2*BETWEEN_ROBOTS);
         }
       }
     }

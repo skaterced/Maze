@@ -59,12 +59,12 @@ bool canGoTo(uint8_t ind, uint8_t direction, uint8_t what){ //what: 0:Robot, 1: 
   if (-1!=temp){
     if (0==(tiles[ind].walls&(0x10<<direction))){
       if (TILE_BOMB==(tiles[temp].walls&TILE_BOMB)){
-        if (2==what)
+        if (EXPLOSION==what)
           return true;
         return false;
       }
       if (TILE_MONSTER==(tiles[temp].walls&TILE_MONSTER)){
-        if (1==what)
+        if (MONSTER==what)
           return false;
         return true;
       }
