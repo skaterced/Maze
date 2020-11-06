@@ -10,6 +10,8 @@
           A+Up/Down: (not yet but...) Change the B button effect          
           
       Hope you'll enjoy !   
+
+      known bug: -if you go on a monster, he will ev. move
 */
 
 #include "menu.h" 
@@ -70,11 +72,11 @@ void loop() { // -------------------------  Init loop --------------------------
   
   else if (MAZE==game){  // _____________________|     |___________| Maze |___________|    |______________________________|
       //arduboy.clear();
-    /* //test
-    p1.score=monsters[0].dir;
-    p2.score=monsters[1].dir;   
-    inGameMenu(true, p1.score, p2.score); //"test mode" if true
-    */
+     //test
+    p1.score=90;
+    p2.score=-10;   
+    //inGameMenu(true, p1.score, p2.score); //"test mode" if true
+    
     inGameMenu(false, 0,0); //"test mode" if true
     
     arduboy.fillRect(leftBorder-2,0,84,64,1);
@@ -92,10 +94,10 @@ void loop() { // -------------------------  Init loop --------------------------
       if (timer==HOLD_THRESHOLD){ //to prevent a player to play one move too much (and use one of his opponent's move)
         //hold=false;
         //ticks (robot has done one action)    
-        
+        checkMonsterCollision();
         if (checkBombs()){        
           //hold=true;
-          for (uint8_t i=0; i<nbMonstersPlaying; i++){
+          for (uint8_t i=0; i<monstersPlaying; i++){
             if (TILE_EXPLODING==(tiles[getIndice(monsters[i].x,monsters[i].y)].walls&TILE_EXPLODING))
               monsters[i].dir=DEAD;
           }
@@ -110,10 +112,9 @@ void loop() { // -------------------------  Init loop --------------------------
             //timer+=3;
           }
         }
-        else
-          if (!controlMonsters()){ //check if false (all monsters dead)
-            if (nbMonstersPlaying<NB_MONSTER_MAX){
-              nbMonstersPlaying++;
+        else if (!controlMonsters()){ //check if false (all monsters dead)
+            if (monstersPlaying<NB_MONSTER_MAX){
+              monstersPlaying++;
             }
             mazeInit();
           }
@@ -136,18 +137,26 @@ void loop() { // -------------------------  Init loop --------------------------
         if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
           hold=false;
         }
+        else { //check who's dead anc inc (or dec if coop) score
+          
+        }
       }
       else if (timer>90){
         mazeInit();
       }
     }
-    drawMonsters();
-    p1.drawBombs();
-    if (twoPlayersMode){
-      p2.drawBombs();
-      p2.draw(false);
+    if ((timer>50)&&(timer<91)&&hold){
+      drawScore();
     }
-    p1.draw(true);  
+    else {  
+      drawMonsters();
+      p1.drawBombs();
+      if (twoPlayersMode){
+        p2.drawBombs();
+        p2.draw(false);
+      }
+      p1.draw(true);  
+    }
   }
   
   else {

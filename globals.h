@@ -78,7 +78,7 @@ int cursY=30;
 uint8_t movesInit=4;
 uint8_t movesLeft=movesInit/2;
 bool monstersMoved = false;
-uint8_t nbMonstersPlaying=7;
+uint8_t monstersPlaying=7;
 //uint8_t stoneArray [81];
 
 

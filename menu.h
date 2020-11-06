@@ -102,6 +102,9 @@ bool mainMenu(void) {
 void optionMenu(void){      
   arduboy.setCursor(10,10);
   arduboy.print(F("Starting Lvl :"));
+  // random bomb timer?
+  // 2P Coop or VS
+  //cheat
 //  arduboy.print(difficulty);
   arduboy.setCursor(10,20);
   arduboy.print("Controls : " );
@@ -148,6 +151,21 @@ void credit (void){
   arduboy.setCursor(0,55);
   arduboy.print("W.Github.com/skaterced"); 
 
+}
+
+void drawScore(){
+  arduboy.fillRect(10,10,104,54,0);
+  arduboy.setCursor(42,20);
+  arduboy.print(F("Score:")); 
+  arduboy.setCursor(20,30);
+  arduboy.print(p1.score);
+  arduboy.setCursor(80,30);
+  arduboy.print(p2.score);
+  arduboy.setCursor(42,40);
+  arduboy.print(F("Level: ")); 
+  arduboy.print(monstersPlaying);
+
+  //lvl
 }
    
 #endif

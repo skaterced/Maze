@@ -101,7 +101,7 @@ bool checkMonsterCollision(void) { //between a robot and a monster
   Player * pp;
   pp = &p1;
   for (uint8_t j = 0; j < 2; j++ ) {
-    for (uint8_t i = 0; i < nbMonstersPlaying; i++) {
+    for (uint8_t i = 0; i < monstersPlaying; i++) {
       if ((pp->x == monsters[i].x) && (pp->y == monsters[i].y) && ((monsters[i].dir&DEAD) != DEAD)) {
         pp->dir |= DEAD;
         return true;
@@ -114,7 +114,7 @@ bool checkMonsterCollision(void) { //between a robot and a monster
 
 void checkCrush(uint8_t ind, uint8_t what){
   // crushing dead monsters body (no matter who did this)
-  for (uint8_t i = 0; i < nbMonstersPlaying; i++) {
+  for (uint8_t i = 0; i < monstersPlaying; i++) {
     if ((monsters[i].dir&DEAD) == DEAD) {
       if (getIndice(monsters[i].x,monsters[i].y)==ind){
         monsters[i].y=182; //six feet under...
@@ -127,7 +127,7 @@ void checkCrush(uint8_t ind, uint8_t what){
 bool controlMonsters() { //return false if every monsters are dead
   bool alive = false;
   uint8_t temp = 0;
-  for (uint8_t i = 0; i < nbMonstersPlaying; i++) {
+  for (uint8_t i = 0; i < monstersPlaying; i++) {
     if ((monsters[i].dir&DEAD) != DEAD) {
       temp = (monsters[i].dir & 0xF0);
       monsters[i].dir = (monsters[i].dir & 0x0F);
@@ -159,7 +159,7 @@ bool controlMonsters() { //return false if every monsters are dead
 
 void monstersInit(void) {
   for (uint8_t i = 0; i < NB_MONSTER_MAX; i++) {
-    if (i < nbMonstersPlaying) {
+    if (i < monstersPlaying) {
       monsters[i].reInit();
     }
     else { //just in case...
@@ -170,7 +170,7 @@ void monstersInit(void) {
 }
 
 void drawMonsters() {
-  for (uint8_t i = 0; i < nbMonstersPlaying; i++) {
+  for (uint8_t i = 0; i < monstersPlaying; i++) {
     monsters[i].draw();
   }
 }
