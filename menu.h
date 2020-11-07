@@ -84,9 +84,14 @@ bool mainMenu(void) {
     if (hold){
       game=cursX;
       if (game<3){
+        p1.lives=3;
+        p1.score=p2.score=0;
         if (1==game){
           game=2;
           twoPlayersMode=false;
+          p2.lives=3;
+          p2.x=90;
+          p2.dir=0;
         }
         randomSeed((int)timer*37); 
         return true;     
@@ -100,42 +105,57 @@ bool mainMenu(void) {
 }
   
 void optionMenu(void){      
+  
+  arduboy.drawChar(0,cursY,27,1,0,1);
+  arduboy.drawChar(4,cursY,26,1,0,1);
   arduboy.setCursor(10,10);
-  arduboy.print(F("Starting Lvl :"));
-  // random bomb timer?
-  // 2P Coop or VS
-  //cheat
-//  arduboy.print(difficulty);
+  arduboy.print(F("2P mode : "));
+  arduboy.print(versus? "VS":"Coop");
   arduboy.setCursor(10,20);
-  arduboy.print("Controls : " );
-//    arduboy.print(forEmulator ? "PC":"Arduboy");
+  arduboy.print(F("Starting Lvl : "));
+  arduboy.print(monstersPlaying);
+  // random bomb timer?
+  
+  //cheat
+/*  arduboy.print(difficulty);
+  arduboy.setCursor(10,20);
+  arduboy.print("Controls : " )
+  //    arduboy.print(forEmulator ? "PC":"Arduboy");
   arduboy.setCursor(0,55);
-  arduboy.print("WW.Github.com/skaterced");
-  arduboy.setCursor(1,40);
+  arduboy.print("WW.Github.com/skaterced");*/
+  arduboy.setCursor(1,55);
   arduboy.print("A: Change    B: Back");
   
-  arduboy.drawChar(0,cursY*10+10,16,1,0,1);
+  //arduboy.drawChar(0,cursY*10+10,16,1,0,1);
 
 
   if (arduboy.justPressed(DOWN_BUTTON))
   {
-    if (cursY<1){
-      cursY++;
+    if (cursY<40){
+      cursY+=10;
     }
   }
   if (arduboy.justPressed(UP_BUTTON))
   {
     if (cursY>0){
-      cursY--;
+      cursY-=10;
     }
   }
-  if (arduboy.justPressed(A_BUTTON))
+  if ((arduboy.justPressed(A_BUTTON))||(arduboy.justPressed(LEFT_BUTTON))||(arduboy.justPressed(RIGHT_BUTTON)))
   {
     switch (cursY){
-      case 0:
-      
-//        if (++difficulty==5)
-//          difficulty=1;
+      case 10:
+        versus=!versus;
+      break;
+      case 20:
+        if (arduboy.justPressed(LEFT_BUTTON)){
+          if (--monstersPlaying==0)
+          monstersPlaying=NB_MONSTER_MAX;  
+        }
+        else {
+          if (++monstersPlaying>NB_MONSTER_MAX)
+            monstersPlaying=1;
+        }
       break;
     }
     
@@ -153,19 +173,34 @@ void credit (void){
 
 }
 
-void drawScore(){
-  arduboy.fillRect(10,10,104,54,0);
+bool drawScore(){
+  bool GO=false;
+  if ((0==p1.lives)||(0==p2.lives)){
+    GO=true;
+    arduboy.print(F("Game Over")); 
+  }
+  else {
+    arduboy.print(F("lives : "));
+    arduboy.print(p1.lives); 
+  }
   arduboy.setCursor(42,20);
-  arduboy.print(F("Score:")); 
-  arduboy.setCursor(20,30);
-  arduboy.print(p1.score);
-  arduboy.setCursor(80,30);
-  arduboy.print(p2.score);
-  arduboy.setCursor(42,40);
   arduboy.print(F("Level: ")); 
-  arduboy.print(monstersPlaying);
+  arduboy.print(monstersPlaying);  
+  arduboy.setCursor(42,30);
+  arduboy.print(F("score:")); 
+  
+  if (twoPlayersMode){
+    arduboy.setCursor(20,40);
+    arduboy.print(p1.score);
+    arduboy.setCursor(80,40);
+    arduboy.print(p2.score);
+  }
+  else {
+    arduboy.setCursor(80,30);
+    arduboy.print(p1.score);
+  }
 
-  //lvl
+return GO;
 }
    
 #endif

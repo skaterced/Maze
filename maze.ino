@@ -11,7 +11,12 @@
           
       Hope you'll enjoy !   
 
-      known bug: -if you go on a monster, he will ev. move
+      known bug: 
+        -if you go on a monster, he will even. move
+        -dead monsters body keep "screaming" when a bomb explode
+
+      unexplained bug:
+      ¨ -sometimes in 1P mode, you die for no reason...
 */
 
 #include "menu.h" 
@@ -33,13 +38,9 @@ void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup
 }
 
 void mazeInit(void){
-  cursX=50;//need curs?
-  cursY=8;
   randomTiles(20, twoPlayersMode, true ); //symmetric if 2P //border
-  //todo random player starts
+  //todo? random player starts
   movesLeft=movesInit/2;
-  //monster.dir=0;  Todo reInit monsters
-  //monster.x=31;
   monstersInit();
   p1.init(true);
   if (twoPlayersMode){
@@ -73,8 +74,8 @@ void loop() { // -------------------------  Init loop --------------------------
   else if (MAZE==game){  // _____________________|     |___________| Maze |___________|    |______________________________|
       //arduboy.clear();
      //test
-    p1.score=90;
-    p2.score=-10;   
+    //p1.score=90;
+    //p2.score=-10;   
     //inGameMenu(true, p1.score, p2.score); //"test mode" if true
     
     inGameMenu(false, 0,0); //"test mode" if true
@@ -87,7 +88,21 @@ void loop() { // -------------------------  Init loop --------------------------
     //drawSelector(getIndice(cursX,cursY));
   
     if (!hold){    
-      controlRobot(); // check buttons and play robot's action    
+      bool temp=true;
+      controlRobot(); // check buttons and play robot's action
+      for (uint8_t i = 0; i < monstersPlaying; i++) {
+        if ((monsters[i].dir&DEAD) != DEAD) {  
+          temp=false;
+          break;
+        }        
+      }
+      if (temp){
+          timer=0;
+          if (monstersPlaying<NB_MONSTER_MAX){
+            monstersPlaying++;
+          }
+          game=BETWEEN_GAMES;          
+        }
     }
     else {
       checkMoving();
@@ -98,8 +113,11 @@ void loop() { // -------------------------  Init loop --------------------------
         if (checkBombs()){        
           //hold=true;
           for (uint8_t i=0; i<monstersPlaying; i++){
-            if (TILE_EXPLODING==(tiles[getIndice(monsters[i].x,monsters[i].y)].walls&TILE_EXPLODING))
+            if (TILE_EXPLODING==(tiles[getIndice(monsters[i].x,monsters[i].y)].walls&TILE_EXPLODING)){
               monsters[i].dir=DEAD;
+              p1.score+=SCORE_MONSTER;
+              p2.score+=SCORE_MONSTER;
+            }
           }
           if (TILE_EXPLODING==(tiles[getIndice(p1.x,p1.y)].walls&TILE_EXPLODING))
             p1.dir=DEAD;
@@ -112,12 +130,15 @@ void loop() { // -------------------------  Init loop --------------------------
             //timer+=3;
           }
         }
-        else if (!controlMonsters()){ //check if false (all monsters dead)
+        else {
+          controlMonsters();
+        }
+        /*else if (!controlMonsters()){ //check if false (all monsters dead) todo: make that elsewhere
             if (monstersPlaying<NB_MONSTER_MAX){
               monstersPlaying++;
             }
             mazeInit();
-          }
+          }*/
       }
       else if(timer==HOLD_THRESHOLD+1){
         controlMonsters();
@@ -134,31 +155,66 @@ void loop() { // -------------------------  Init loop --------------------------
         }
       }
       else if (timer==HOLD_THRESHOLD+10){ //bomb has finished exploding 
-        if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
+        /*if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
+          hold=false;
+        }*/
+        if ((DEAD==p1.dir)||((DEAD==p2.dir)&&(twoPlayersMode))) { //check who's dead and inc (or dec if coop) score
+          if (twoPlayersMode){
+            if (!versus){
+              if(DEAD==p1.dir){
+                p1.score-=10;
+                p1.lives--;
+                //p1.dir=0;
+              }      
+              else {
+                p2.lives--;            
+                //p2.dir=0;
+                p2.score-=10;   
+              }
+            }
+            else{
+              p1.lives--;
+              if(DEAD==p1.dir)
+                p2.score+=10;            
+              else 
+                p1.score+=10;
+            }
+          }
+          else{
+            p1.lives--;
+          }
+        }
+        else {
           hold=false;
         }
-        else { //check who's dead anc inc (or dec if coop) score
-          
-        }
+      } 
+      else if (timer>HOLD_THRESHOLD+40){
+        timer=0;
+        game=BETWEEN_GAMES;
       }
-      else if (timer>90){
+    }// end of "if Hold"
+          
+    drawMonsters();
+    p1.drawBombs();
+    if (twoPlayersMode){
+      p2.drawBombs();
+      p2.draw(false);
+    }
+    p1.draw(true);    
+  }
+  
+  else if (BETWEEN_GAMES==game){
+    bool GO=drawScore();
+    if (timer>90){
+      if (GO){
+        game=MENU;    
+      }
+      else{
+        game=MAZE;
         mazeInit();
       }
     }
-    if ((timer>50)&&(timer<91)&&hold){
-      drawScore();
-    }
-    else {  
-      drawMonsters();
-      p1.drawBombs();
-      if (twoPlayersMode){
-        p2.drawBombs();
-        p2.draw(false);
-      }
-      p1.draw(true);  
-    }
   }
-  
   else {
     arduboy.setCursor(0,0);
     arduboy.println("please recompile with");

@@ -68,6 +68,7 @@ class Player {
     uint8_t weapons; //0 means normal Bombs
     uint8_t range;
     uint8_t dir; //if dir==DEAD, direction heaven
+    uint8_t lives=3;
     int score;
     Bomb bombs[3];
     Player(uint8_t X, uint8_t Y) {

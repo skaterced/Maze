@@ -11,6 +11,7 @@ Arduboy2 arduboy;
 #define CREDIT 1
 #define MAZE 2
 #define OPTION 3
+#define BETWEEN_GAMES 4
 //#define 0 0 //1 for White on Black... I think I'll stick to Black on White
 
 #define HAUT 3
@@ -43,6 +44,7 @@ Arduboy2 arduboy;
 #define BETWEEN_ROBOTS 5 //Frame difference between Robot1 & Robot2
 #define WEAPON_MINE 0
 #define WEAPON_PUNCH 1
+#define SCORE_MONSTER 10
 
 #define BOMB_RANGE_MAX 3
 #define NB_BOMB_MAX 3
@@ -73,12 +75,13 @@ int upBorder=2;
 //int adjSelectX=0; //no more other games... todo: clean
 //int adjSelectY=0;
 
-int cursX=2;
-int cursY=30;
+uint8_t cursX=2;
+uint8_t cursY=10;
 uint8_t movesInit=4;
 uint8_t movesLeft=movesInit/2;
 bool monstersMoved = false;
-uint8_t monstersPlaying=7;
+uint8_t monstersPlaying=1;
+bool versus=false;
 //uint8_t stoneArray [81];
 
 
