@@ -18,12 +18,13 @@
       unexplained bug:
       ¨ -sometimes in 1P mode, you die for no reason...
 */
-
+#include <Arduboy2.h>
 #include "menu.h" 
 #include "globals.h"
 #include "function.h" 
 #include "robot.h"
 #include "monster.h"
+#include "tiles.h"
 
 #define NBGAMES 8
 
@@ -133,12 +134,6 @@ void loop() { // -------------------------  Init loop --------------------------
         else {
           controlMonsters();
         }
-        /*else if (!controlMonsters()){ //check if false (all monsters dead) todo: make that elsewhere
-            if (monstersPlaying<NB_MONSTER_MAX){
-              monstersPlaying++;
-            }
-            mazeInit();
-          }*/
       }
       else if(timer==HOLD_THRESHOLD+1){
         controlMonsters();
@@ -161,14 +156,11 @@ void loop() { // -------------------------  Init loop --------------------------
         if ((DEAD==p1.dir)||((DEAD==p2.dir)&&(twoPlayersMode))) { //check who's dead and inc (or dec if coop) score
           if (twoPlayersMode){
             if (!versus){
+              p1.lives--; 
               if(DEAD==p1.dir){
                 p1.score-=10;
-                p1.lives--;
-                //p1.dir=0;
               }      
-              else {
-                p2.lives--;            
-                //p2.dir=0;
+              else {                           
                 p2.score-=10;   
               }
             }
@@ -205,7 +197,7 @@ void loop() { // -------------------------  Init loop --------------------------
   
   else if (BETWEEN_GAMES==game){
     bool GO=drawScore();
-    if (timer>90){
+    if (timer>100){
       if (GO){
         game=MENU;    
       }

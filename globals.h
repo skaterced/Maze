@@ -2,9 +2,12 @@
 #define globals_h
 
 #include <Arduboy2.h>
-//#include <stdlib.h>
 
 Arduboy2 arduboy;
+
+//#include <stdlib.h>
+
+//Arduboy2 arduboy;
 
 //todo clean those define
 #define MENU 0
@@ -57,31 +60,31 @@ const char* weaponList[] PROGMEM = {
   "Fist"
 };
 */
-//uint8_t scoreTimer=0;
-uint8_t timer=0;
-bool hold=false;
+//uint8_t scoreTimer:
+extern uint8_t timer;
+extern bool hold;
 //uint8_t difficulty=2;  //must be between 1-4
-uint8_t game=MENU;
-//int temp=0;
-bool p1Playing=true; //false: p2's turn
-bool twoPlayersMode = true;
-uint8_t casesLength=10;
-uint8_t casesHeight=10;
-uint8_t casesCol=8;
-uint8_t casesRow=6;
-int leftBorder=LEFTBORDERP1;
-int upBorder=2;
+extern uint8_t game;
+//int temp;
+extern bool p1Playing; //false: p2's turn
+extern bool twoPlayersMode ;
+extern uint8_t casesLength;
+extern uint8_t casesHeight;
+extern uint8_t casesCol;
+extern uint8_t casesRow;
+extern int leftBorder;
+extern int upBorder;
 
 //int adjSelectX=0; //no more other games... todo: clean
 //int adjSelectY=0;
 
-uint8_t cursX=2;
-uint8_t cursY=10;
-uint8_t movesInit=4;
-uint8_t movesLeft=movesInit/2;
-bool monstersMoved = false;
-uint8_t monstersPlaying=1;
-bool versus=false;
+extern uint8_t cursX;
+extern uint8_t cursY;
+extern uint8_t movesInit;
+extern uint8_t movesLeft;
+extern bool monstersMoved ;
+extern uint8_t monstersPlaying;
+extern bool versus;
 //uint8_t stoneArray [81];
 
 
