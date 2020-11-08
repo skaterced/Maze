@@ -18,6 +18,7 @@ void Tile::turn(bool clockWise){
         }
       }
       walls&=0x0F;
+      walls|=onlyWalls;
 }
 
 void drawTiles(void){
@@ -27,26 +28,26 @@ void drawTiles(void){
     x= leftBorder + (i%casesCol)*casesLength;
     y= upBorder + i/casesCol*casesHeight;//+upBorder+2;
     if (WALL_UP==(tiles[i].walls&WALL_UP)){
-      arduboy.drawLine(x,y,x+casesLength-1,y,0);
-      arduboy.drawLine(x,y-1,x+casesLength-1,y-1,0);
+      ab.drawLine(x,y,x+casesLength-1,y,0);
+      ab.drawLine(x,y-1,x+casesLength-1,y-1,0);
     }
     if (WALL_DOWN==(tiles[i].walls&WALL_DOWN)){
-      arduboy.drawLine(x,y+casesHeight-1,x+casesLength-1,y+casesHeight-1,0);
-      arduboy.drawLine(x,y+casesHeight,x+casesLength-1,y+casesHeight,0);
+      ab.drawLine(x,y+casesHeight-1,x+casesLength-1,y+casesHeight-1,0);
+      ab.drawLine(x,y+casesHeight,x+casesLength-1,y+casesHeight,0);
     }      
     if (WALL_RIGHT==(tiles[i].walls&WALL_RIGHT)){
-      arduboy.drawLine(x+casesLength-1,y,x+casesLength-1,y+casesHeight-1,0);
-      arduboy.drawLine(x+casesLength,y,x+casesLength,y+casesHeight-1,0);
+      ab.drawLine(x+casesLength-1,y,x+casesLength-1,y+casesHeight-1,0);
+      ab.drawLine(x+casesLength,y,x+casesLength,y+casesHeight-1,0);
     }
     if (WALL_LEFT==(tiles[i].walls&WALL_LEFT)){
-      arduboy.drawLine(x,y,x,y+casesHeight-1,0);
-      arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,0);
+      ab.drawLine(x,y,x,y+casesHeight-1,0);
+      ab.drawLine(x-1,y,x-1,y+casesHeight-1,0);
     }
     if (TILE_EXPLODING==(tiles[i].walls&TILE_EXPLODING)){
       if (timer<(HOLD_THRESHOLD+5))
-        arduboy.drawChar(x+2,y+1,'O',0,1,1);
+        ab.drawChar(x+2,y+1,'O',0,1,1);
       else if (timer<(HOLD_THRESHOLD+10))
-        arduboy.drawChar(x+2,y+1,'@',0,1,1);
+        ab.drawChar(x+2,y+1,'@',0,1,1);
       else {
         tiles[i].walls&=0xF0; //clears the tile content
       }

@@ -1,5 +1,7 @@
 #include "globals.h"
-#define globals_h
+//#define globals_h
+
+Arduboy2 ab;
 
 //uint8_t scoreTimer=0;
 uint8_t timer=0;

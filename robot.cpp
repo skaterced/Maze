@@ -108,8 +108,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   }
   temp=getIndice(pp->x,pp->y);
   //walls=tiles[temp].walls;
-  if (arduboy.justPressed(B_BUTTON)){ //B action (Bomb for now)    
-    if (arduboy.pressed(A_BUTTON)){
+  if (ab.justPressed(B_BUTTON)){ //B action (Bomb for now)    
+    if (ab.pressed(A_BUTTON)){
       //secondary weapon (or switch weapon)
     }
     else {
@@ -119,8 +119,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       }
     }
   }
-  else if (arduboy.justPressed(UP_BUTTON)){
-    if (arduboy.pressed(A_BUTTON)){
+  else if (ab.justPressed(UP_BUTTON)){
+    if (ab.pressed(A_BUTTON)){
       //select weapon
     }
     else {
@@ -132,8 +132,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       }
     }
   }
-  else if (arduboy.justPressed(DOWN_BUTTON)){
-    if (arduboy.pressed(A_BUTTON)){
+  else if (ab.justPressed(DOWN_BUTTON)){
+    if (ab.pressed(A_BUTTON)){
       //select weapon or just EoT...
       movesLeft=1; //because now "movesLeft-- is done outside this function
       hold=true;
@@ -148,8 +148,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       }
     }
   }
-  else if (arduboy.justPressed(RIGHT_BUTTON)){
-    if (arduboy.pressed(A_BUTTON)){
+  else if (ab.justPressed(RIGHT_BUTTON)){
+    if (ab.pressed(A_BUTTON)){
       if (0!=tiles[temp].walls){
         tiles[temp].turn(false);
         imposeWall(temp, true);
@@ -166,8 +166,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       }
     }
   }
-  else if (arduboy.justPressed(LEFT_BUTTON)){
-    if (arduboy.pressed(A_BUTTON)){
+  else if (ab.justPressed(LEFT_BUTTON)){
+    if (ab.pressed(A_BUTTON)){
       if (0!=tiles[temp].walls){
         tiles[temp].turn(true);
         imposeWall(temp, true);

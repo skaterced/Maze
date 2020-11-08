@@ -3,11 +3,11 @@
 
 #include <Arduboy2.h>
 
-Arduboy2 arduboy;
+extern Arduboy2 ab;
 
 //#include <stdlib.h>
 
-//Arduboy2 arduboy;
+//Arduboy2 ab;
 
 //todo clean those define
 #define MENU 0

@@ -15,8 +15,13 @@
         -if you go on a monster, he will even. move
         -dead monsters body keep "screaming" when a bomb explode
 
-      unexplained bug:
-      ¨ -sometimes in 1P mode, you die for no reason...
+befor:
+Sketch uses 16058 bytes (56%) of program storage space. Maximum is 28672 bytes.
+Global variables use 1459 bytes (56%) of dynamic memory, leaving 1101 bytes for local variables. Maximum is 2560 bytes.
+after spliting:
+Sketch uses 16124 bytes (56%) of program storage space. Maximum is 28672 bytes.
+Global variables use 1459 bytes (56%) of dynamic memory, leaving 1101 bytes for local variables. Maximum is 2560 bytes.
+
 */
 #include <Arduboy2.h>
 #include "menu.h" 
@@ -28,14 +33,16 @@
 
 #define NBGAMES 8
 
+Monster monsters[NB_MONSTER_MAX];
+
 uint8_t timeUnit=5;
 uint8_t test=0;
 
 void setup() { // SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS  Setup SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-  arduboy.begin();
-  arduboy.clear();
-  arduboy.setFrameRate(60);
-  arduboy.initRandomSeed();  
+  ab.begin();
+  ab.clear();
+  ab.setFrameRate(60);
+  ab.initRandomSeed();  
 }
 
 void mazeInit(void){
@@ -43,6 +50,7 @@ void mazeInit(void){
   //todo? random player starts
   movesLeft=movesInit/2;
   monstersInit();
+  monsters[0].type=1; //test
   p1.init(true);
   if (twoPlayersMode){
     p2.init(false);
@@ -54,12 +62,12 @@ void mazeInit(void){
 }
 void loop() { // -------------------------  Init loop -------------------------------------------------------------------------
 
-  if (!(arduboy.nextFrame()))
+  if (!(ab.nextFrame()))
     return;
     
-  arduboy.clear(); 
+  ab.clear(); 
   timer++;
-  arduboy.pollButtons();    
+  ab.pollButtons();    
     
   if (MENU==game){
     if (mainMenu())
@@ -73,7 +81,7 @@ void loop() { // -------------------------  Init loop --------------------------
   }
   
   else if (MAZE==game){  // _____________________|     |___________| Maze |___________|    |______________________________|
-      //arduboy.clear();
+      //ab.clear();
      //test
     //p1.score=90;
     //p2.score=-10;   
@@ -81,7 +89,7 @@ void loop() { // -------------------------  Init loop --------------------------
     
     inGameMenu(false, 0,0); //"test mode" if true
     
-    arduboy.fillRect(leftBorder-2,0,84,64,1);
+    ab.fillRect(leftBorder-2,0,84,64,1);
   
     drawTiles();
   
@@ -208,10 +216,10 @@ void loop() { // -------------------------  Init loop --------------------------
     }
   }
   else {
-    arduboy.setCursor(0,0);
-    arduboy.println("please recompile with");
-    arduboy.println("this game included");
-    arduboy.println("(#include xxx_h)");
+    ab.setCursor(0,0);
+    ab.println("please recompile with");
+    ab.println("this game included");
+    ab.println("(#include xxx_h)");
   }
-  arduboy.display();
+  ab.display();
 }

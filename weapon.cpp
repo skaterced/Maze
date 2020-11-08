@@ -12,8 +12,8 @@ Bomb::Bomb(void) {
 }
 
 void Bomb::draw(void){
-  arduboy.drawPixel(x+3+leftBorder,y+3+upBorder,(timer&0x04)>>2);
-  arduboy.drawCircle(x+4+leftBorder,y+4+upBorder,2,0);      
+  ab.drawPixel(x+3+leftBorder,y+3+upBorder,(timer&0x04)>>2);
+  ab.drawCircle(x+4+leftBorder,y+4+upBorder,2,0);      
 }
 
 

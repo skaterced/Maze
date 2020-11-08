@@ -12,5 +12,6 @@ void optionMenu(void);
 void credit (void);
 
 bool drawScore();
+void inGameMenu(bool test, int test1, int test2);
 
 #endif

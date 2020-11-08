@@ -4,11 +4,11 @@
 
 bool mainMenu(void) {
   /*
-  arduboy.drawChar(1,1,82,1,0,3); //ROBOT MAZE
-  arduboy.drawChar(17,1,79,1,0,3);
-  arduboy.drawChar(33,1,66,1,0,3);
-  arduboy.drawChar(49,1,79,1,0,3);
-  arduboy.drawChar(65,1,84,1,0,3);
+  ab.drawChar(1,1,82,1,0,3); //ROBOT MAZE
+  ab.drawChar(17,1,79,1,0,3);
+  ab.drawChar(33,1,66,1,0,3);
+  ab.drawChar(49,1,79,1,0,3);
+  ab.drawChar(65,1,84,1,0,3);
   */
   int scroll;
   if ((timer<=MENU_SCROLL)&&(false==hold)){
@@ -20,63 +20,63 @@ bool mainMenu(void) {
   }
   
   if ((!hold)&&(timer<=MENU_SCROLL-25)){
-    arduboy.setCursor(22,15);
-    arduboy.print(F("C" "\x82" "dric Martin\n"));
-    arduboy.setCursor(39,25);
-    arduboy.print(F("present"));    
+    ab.setCursor(22,15);
+    ab.print(F("C" "\x82" "dric Martin\n"));
+    ab.setCursor(39,25);
+    ab.print(F("present"));    
   }
   
-  arduboy.drawChar(scroll+66,25,77,1,0,3);
-  arduboy.drawChar(scroll+82,25,65,1,0,3);
-  arduboy.drawChar(scroll+98,25,90,1,0,3);
-  arduboy.drawChar(scroll+114,25,69,1,0,3);
+  ab.drawChar(scroll+66,25,77,1,0,3);
+  ab.drawChar(scroll+82,25,65,1,0,3);
+  ab.drawChar(scroll+98,25,90,1,0,3);
+  ab.drawChar(scroll+114,25,69,1,0,3);
 
   scroll*=-1;
 
-  arduboy.drawChar(scroll+1,1,66,1,0,3); //Bomber Maze
-  arduboy.drawChar(scroll+17,1,79,1,0,3);
-  arduboy.drawChar(scroll+33,1,77,1,0,3);
-  arduboy.drawChar(scroll+49,1,66,1,0,3);
-  arduboy.drawChar(scroll+65,1,69,1,0,3);
-  arduboy.drawChar(scroll+81,1,82,1,0,3);
+  ab.drawChar(scroll+1,1,66,1,0,3); //Bomber Maze
+  ab.drawChar(scroll+17,1,79,1,0,3);
+  ab.drawChar(scroll+33,1,77,1,0,3);
+  ab.drawChar(scroll+49,1,66,1,0,3);
+  ab.drawChar(scroll+65,1,69,1,0,3);
+  ab.drawChar(scroll+81,1,82,1,0,3);
 
   if (hold){
-    arduboy.setCursor(0,55);
+    ab.setCursor(0,55);
     switch (cursX){
       case 1:
-        arduboy.print(F("      1P Start  ->"));
+        ab.print(F("      1P Start  ->"));
         break;
       case 2:
-        arduboy.print(F("  <-  2P Start  ->"));
+        ab.print(F("  <-  2P Start  ->"));
         break;
       case 3:
-        arduboy.print(F("  <-  Option"));  
+        ab.print(F("  <-  Option"));  
         break;
 /*
        case 1:
-        arduboy.print(F("       Credit -> Star"));
+        ab.print(F("       Credit -> Star"));
         break;
       case 2:
-        arduboy.print(F("edit <- Start -> Opti"));
+        ab.print(F("edit <- Start -> Opti"));
         break;
       case 3:
-        arduboy.print(F("tart <- Option"));  
+        ab.print(F("tart <- Option"));  
         break;
  */
     }
   }
   
-  if (arduboy.justPressed(LEFT_BUTTON))
+  if (ab.justPressed(LEFT_BUTTON))
   {
     if (cursX>1)
       cursX--;
   } 
-    if (arduboy.justPressed(RIGHT_BUTTON))
+    if (ab.justPressed(RIGHT_BUTTON))
   {
     if (cursX<3)
       cursX++;
   }    
-  if (arduboy.justPressed(A_BUTTON))
+  if (ab.justPressed(A_BUTTON))
   {
     if (hold){
       game=cursX;
@@ -103,49 +103,49 @@ bool mainMenu(void) {
   
 void optionMenu(void){      
   
-  arduboy.drawChar(0,cursY,27,1,0,1);
-  arduboy.drawChar(4,cursY,26,1,0,1);
-  arduboy.setCursor(10,10);
-  arduboy.print(F("2P mode : "));
-  arduboy.print(versus? "VS":"Coop");
-  arduboy.setCursor(10,20);
-  arduboy.print(F("Starting Lvl : "));
-  arduboy.print(monstersPlaying);
+  ab.drawChar(0,cursY,27,1,0,1);
+  ab.drawChar(4,cursY,26,1,0,1);
+  ab.setCursor(10,10);
+  ab.print(F("2P mode : "));
+  ab.print(versus? "VS":"Coop");
+  ab.setCursor(10,20);
+  ab.print(F("Starting Lvl : "));
+  ab.print(monstersPlaying);
   // random bomb timer?
   
   //cheat
-/*  arduboy.print(difficulty);
-  arduboy.setCursor(10,20);
-  arduboy.print("Controls : " )
-  //    arduboy.print(forEmulator ? "PC":"Arduboy");
-  arduboy.setCursor(0,55);
-  arduboy.print("WW.Github.com/skaterced");*/
-  arduboy.setCursor(1,55);
-  arduboy.print("A: Change    B: Back");
+/*  ab.print(difficulty);
+  ab.setCursor(10,20);
+  ab.print("Controls : " )
+  //    ab.print(forEmulator ? "PC":"Arduboy");
+  ab.setCursor(0,55);
+  ab.print("WW.Github.com/skaterced");*/
+  ab.setCursor(1,55);
+  ab.print("A: Change    B: Back");
   
-  //arduboy.drawChar(0,cursY*10+10,16,1,0,1);
+  //ab.drawChar(0,cursY*10+10,16,1,0,1);
 
 
-  if (arduboy.justPressed(DOWN_BUTTON))
+  if (ab.justPressed(DOWN_BUTTON))
   {
     if (cursY<40){
       cursY+=10;
     }
   }
-  if (arduboy.justPressed(UP_BUTTON))
+  if (ab.justPressed(UP_BUTTON))
   {
     if (cursY>0){
       cursY-=10;
     }
   }
-  if ((arduboy.justPressed(A_BUTTON))||(arduboy.justPressed(LEFT_BUTTON))||(arduboy.justPressed(RIGHT_BUTTON)))
+  if ((ab.justPressed(A_BUTTON))||(ab.justPressed(LEFT_BUTTON))||(ab.justPressed(RIGHT_BUTTON)))
   {
     switch (cursY){
       case 10:
         versus=!versus;
       break;
       case 20:
-        if (arduboy.justPressed(LEFT_BUTTON)){
+        if (ab.justPressed(LEFT_BUTTON)){
           if (--monstersPlaying==0)
           monstersPlaying=NB_MONSTER_MAX;  
         }
@@ -157,46 +157,104 @@ void optionMenu(void){
     }
     
   }
-  if (arduboy.justPressed(B_BUTTON))
+  if (ab.justPressed(B_BUTTON))
   {
     game=MENU;
-    arduboy.clear();
+    ab.clear();
   }     
 }
 
 void credit (void){
-  arduboy.setCursor(0,55);
-  arduboy.print("W.Github.com/skaterced"); 
+  ab.setCursor(0,55);
+  ab.print("W.Github.com/skaterced"); 
 
 }
 
 bool drawScore(){
-  bool GO=false;
+  bool GO=false; //(Game Over)
   if ((0==p1.lives)||(0==p2.lives)){
     GO=true;
-    arduboy.print(F("Game Over")); 
+    ab.print(F("Game Over")); 
   }
   else {
-    arduboy.print(F("lives : "));
-    arduboy.print(p1.lives); 
+    ab.print(F("lives : "));
+    ab.print(p1.lives); 
   }
-  arduboy.setCursor(42,20);
-  arduboy.print(F("Level: ")); 
-  arduboy.print(monstersPlaying);  
-  arduboy.setCursor(42,30);
-  arduboy.print(F("score:")); 
+  ab.setCursor(42,20);
+  ab.print(F("Level: ")); 
+  ab.print(monstersPlaying);  
+  ab.setCursor(42,30);
+  ab.print(F("score:")); 
   
   if (twoPlayersMode){
-    arduboy.setCursor(20,40);
-    arduboy.print(p1.score);
-    arduboy.setCursor(90,40);
-    arduboy.print(p2.score);
+    ab.setCursor(20,40);
+    ab.print(p1.score);
+    ab.setCursor(90,40);
+    ab.print(p2.score);
   }
   else {
-    arduboy.setCursor(80,30);
-    arduboy.print(p1.score);
+    ab.setCursor(80,30);
+    ab.print(p1.score);
   }
-
 return GO;
 }
 
+void inGameMenu(bool test, int test1, int test2){
+  //int x=p1Playing? (leftBorder-42):(leftBorder+80);
+  int x;
+  char* s;
+  if (p1Playing){
+    x=0;
+    if (leftBorder<LEFTBORDERP1)
+      leftBorder+=(LEFTBORDERP1-leftBorder)/2;      
+  }
+  else {
+    x=87;
+    if (leftBorder>LEFTBORDERP2)
+      leftBorder-=(leftBorder-LEFTBORDERP2)/2;
+  }
+  ab.fillRect(x ,0,31,64,0);
+  if (test){
+    ab.setCursor(x,30);
+    ab.print(test1);
+    ab.setCursor(x,50);
+    ab.print(test2);
+  }
+  else {
+    if (ab.pressed(A_BUTTON)){
+      ab.drawChar(x,3,24,1,0,1);
+      ab.setCursor(x+5,3);
+      ab.print(F(": 2nd"));
+      ab.setCursor(x,12);
+      ab.print(F("weapon"));
+      ab.drawChar(x,25,27,1,0,1);
+      ab.drawChar(x+5,25,26,1,0,1);
+      ab.setCursor(x+13,25);
+      ab.print(F("Turn"));
+      ab.setCursor(x,34);
+      ab.print(F("Walls"));
+
+      ab.drawChar(x,47,25,1,0,1);    
+      ab.setCursor(x+5,47);
+      ab.print(F(": End"));
+      ab.setCursor(x+15,56);
+      ab.print(F("Turn"));
+    }
+    else {
+      if (twoPlayersMode){
+        ab.setCursor(x,1);
+        ab.print(F("Moves"));
+        ab.setCursor(x+35,1);
+        ab.print(movesLeft);
+      }
+      ab.setCursor(x,20);
+      ab.print(F("B for:"));
+      ab.setCursor(x+5,30);
+      ab.print(F("Bomb"));
+      ab.setCursor(x,45);
+      ab.print(F("hold A"));
+      ab.setCursor(x,55);
+      ab.print(F("+..."));
+    }
+  }
+}
