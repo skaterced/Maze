@@ -7,21 +7,8 @@
 #include "globals.h"
 #include "weapon.h"
 #include "function.h"
-//#include "monster.h"
 
-/*
-#define BETWEEN_ROBOTS 8 //Frame difference between Robot1 & Robot2
 
-#define WEAPON_MINE 0
-#define WEAPON_PUNCH 1
-
-#define BOMB_RANGE_MAX 3
-
-const char* weaponList[] PROGMEM = {
-  "Mine",
-  "Fist"
-};
-*/
 
 const unsigned char robots_bitmap[] PROGMEM = {
 // width, height,
@@ -70,7 +57,7 @@ class Player {
     uint8_t dir; //if dir==DEAD, direction heaven
     uint8_t lives=3;
     int score;
-    Bomb bombs[3];
+    Bomb bombs[NB_BOMB_MAX];
     Player(uint8_t X, uint8_t Y) {
       this->x=X;
       this->y=Y;
@@ -280,7 +267,7 @@ void checkMoving(void){
 
 void explode(uint8_t ind, uint8_t range){
   tiles[ind].walls=(tiles[ind].walls&0xF0)|TILE_EXPLODING;
-  int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1};
+  int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1,-1,-1,-1,-1,-1};
   if (range>BOMB_RANGE_MAX)
     range=BOMB_RANGE_MAX;
   for (uint8_t j=0; j<4; j++){ //explode in all directions
@@ -289,7 +276,18 @@ void explode(uint8_t ind, uint8_t range){
         temp[i+1]=voisin(temp[i],j);
         if (-1!=temp[i+1]){
           if (TILE_BOMB==(tiles[temp[i+1]].walls&TILE_BOMB)){
-            explode(temp[i+1],range);
+            uint8_t range2=0;
+            Player* pp=&p1;
+            for (uint8_t k=0; k<2; k++){
+              for (uint8_t j=0; j<NB_BOMB_MAX; j++){
+                if (getIndice(pp->bombs[j].x,pp->bombs[j].y)==ind){
+                  range2=pp->range;
+                  break;
+                }
+              }
+              pp=&p2;
+            }
+            explode(temp[i+1],(0!=range2)?range2:range);//todo check who's bomb it is and adapt range
           }
           tiles[temp[i+1]].walls=((tiles[temp[i+1]].walls&0xF0)|TILE_EXPLODING);
         }

@@ -43,11 +43,14 @@ Arduboy2 arduboy;
 
 #define BETWEEN_ROBOTS 5 //Frame difference between Robot1 & Robot2
 #define WEAPON_MINE 0
-#define WEAPON_PUNCH 1
+#define WEAPON_DETO 1
+#define BONUS_INACTIVE 0
+#define BONUS_BIGGER 1
+#define BONUS_DETO 2
 #define SCORE_MONSTER 10
 
-#define BOMB_RANGE_MAX 3
-#define NB_BOMB_MAX 3
+#define BOMB_RANGE_MAX 8
+#define NB_BOMB_MAX 3 //per player
 #define NB_MONSTER_MAX 10
 #define BOMB_DEFAULT_T 9
 

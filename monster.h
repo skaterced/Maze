@@ -43,30 +43,25 @@ class Monster {
           if (timer==HOLD_THRESHOLD+10){ //tile has finished exploding, now it contains a dead body
             dir|=0x10;
             tiles[getIndice(x,y)].walls|=TILE_TBD;
+            if (0x20!=(dir&0x20)){
+              if (drop(x,y)){
+                y=166;
+              }
+            }
+            dir|=0x20;            
           }
         }
       }
-      else{
-        if (DEAD != (dir & 0x0F)) {
-          arduboy.drawPixel(x+2+leftBorder+(timer&0x04),y+7+upBorder,0);
-          arduboy.drawCircle(x+4+leftBorder,y+4+upBorder,3,0);      
+      else if (1==type){
+        if (DEAD != (dir & 0x0F)) {          
+          arduboy.drawCircle(x+4+leftBorder,y+4+upBorder,3,0);
+          arduboy.drawPixel(x+1+leftBorder,y+7+upBorder,(0x04==(timer&0x0C))?1:0);
+          arduboy.drawPixel(x+7+leftBorder,y+7+upBorder,(0x0C==(timer&0x0C))?1:0);
   
           if (3 != (dir & 0x0F)) {
             arduboy.drawPixel(x + 3 + leftBorder, y + 4 + upBorder, 0);
             arduboy.drawPixel(x + 5 + leftBorder, y + 4 + upBorder, 0);
           //arduboy.drawPixel(x + 2 + leftBorder + ((timer & 0x08) >> 3) * 3, y + 7 + upBorder, 0);
-          }
-        }
-        else {
-          if ((timer < (HOLD_THRESHOLD + 9))&&((dir&0x10)!=0x10)) {
-            Sprites::drawOverwrite(x + leftBorder, y + upBorder, monstre_bitmap, 1); //monster "sreaming"
-          }
-          else {
-            Sprites::drawOverwrite(x + leftBorder, y + upBorder, robots_bitmap, 2 * BETWEEN_ROBOTS);
-          }
-          if (timer==HOLD_THRESHOLD+10){ //tile has finished exploding, now it contains a dead body
-            dir|=0x10;
-            tiles[getIndice(x,y)].walls|=TILE_TBD;
           }
         }
       }
@@ -140,12 +135,33 @@ bool checkMonsterCollision(void) { //between a robot and a monster
 }
 
 void checkCrush(uint8_t ind, uint8_t what){
-  // crushing dead monsters body (no matter who did this)
-  for (uint8_t i = 0; i < monstersPlaying; i++) {
-    if ((monsters[i].dir&DEAD) == DEAD) {
-      if (getIndice(monsters[i].x,monsters[i].y)==ind){
-        monsters[i].y=182; //six feet under...
-        return;
+  if (ROBOT==what){
+    Player * pp =&p1;
+    if (!p1Playing)
+      pp=&p2;
+      //for(nb_bonus_max...
+      ind=getIndice(pp->x,pp->y);
+      if((pp->x==bonus1.x)&&(pp->y==bonus1.y)){
+        switch (bonus1.type){
+          case BONUS_BIGGER:
+            pp->range++;
+          break;
+          case BONUS_DETO:
+            pp->weapons=WEAPON_DETO;
+          break;
+        }
+        bonus1.type=BONUS_INACTIVE; //break;
+      }
+    //}
+  }
+  else {
+    // crushing dead monsters body (by another monster or by an explosion)
+    for (uint8_t i = 0; i < monstersPlaying; i++) {
+      if ((monsters[i].dir&DEAD) == DEAD) {
+        if (getIndice(monsters[i].x,monsters[i].y)==ind){
+          monsters[i].y=182; //six feet under...
+          return;
+        }
       }
     }
   }

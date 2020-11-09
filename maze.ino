@@ -42,7 +42,7 @@ void mazeInit(void){
   //todo? random player starts
   movesLeft=movesInit/2;
   monstersInit();
-  monsters[0].type=1; //test
+  //monsters[0].type=1; //test
   p1.init(true);
   if (twoPlayersMode){
     p2.init(false);
@@ -107,6 +107,7 @@ void loop() { // -------------------------  Init loop --------------------------
     }
     else {
       checkMoving();
+      checkCrush(0,ROBOT);
       if (timer==HOLD_THRESHOLD){ //to prevent a player to play one move too much (and use one of his opponent's move)
         //hold=false;
         //ticks (robot has done one action)    
@@ -114,8 +115,15 @@ void loop() { // -------------------------  Init loop --------------------------
         if (checkBombs()){        
           //hold=true;
           for (uint8_t i=0; i<monstersPlaying; i++){
-            if (TILE_EXPLODING==(tiles[getIndice(monsters[i].x,monsters[i].y)].walls&TILE_EXPLODING)){
-              monsters[i].dir=DEAD;
+            uint8_t tempI=getIndice(monsters[i].x,monsters[i].y);
+            if (TILE_EXPLODING==(tiles[tempI].walls&TILE_EXPLODING)){
+              if ((monsters[i].dir&0x0F)!=DEAD)
+                monsters[i].dir=DEAD;
+              else
+                checkCrush(tempI,EXPLOSION);
+              if (monsters[i].type==1){
+                explode(tempI,8);
+              }
               p1.score+=SCORE_MONSTER;
               p2.score+=SCORE_MONSTER;
             }
@@ -194,7 +202,7 @@ void loop() { // -------------------------  Init loop --------------------------
         game=BETWEEN_GAMES;
       }
     }// end of "if Hold"
-          
+    bonus1.draw();      
     drawMonsters();
     p1.drawBombs();
     if (twoPlayersMode){
