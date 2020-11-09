@@ -3,7 +3,7 @@
 
 #include "globals.h"
 
-#define DROP_RAND 30
+#define DROP_RAND 60
 
 const unsigned char PROGMEM bonus_bitmap[] = {
 // width, height,

@@ -61,7 +61,7 @@ class Player {
     Player(uint8_t X, uint8_t Y) {
       this->x=X;
       this->y=Y;
-      this->weapons=0;  //
+      this->weapons=1;  //
       this->range=1;
       this->dir=0;      
       this->score=0;
@@ -140,6 +140,69 @@ class Player {
 class Player p1(1,31);
 class Player p2(71,31);
 
+void explode(uint8_t ind, uint8_t range){
+  tiles[ind].walls=(tiles[ind].walls&0xF0)|TILE_EXPLODING;
+  int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1,-1,-1,-1,-1,-1};
+  if (range>BOMB_RANGE_MAX)
+    range=BOMB_RANGE_MAX;
+  for (uint8_t j=0; j<4; j++){ //explode in all directions
+    for (uint8_t i=0; i<range; i++){
+      if (canGoTo(temp[i],j,2)){
+        temp[i+1]=voisin(temp[i],j);
+        if (-1!=temp[i+1]){
+          if (TILE_BOMB==(tiles[temp[i+1]].walls&TILE_BOMB)){
+            uint8_t range2=0;
+            Player* pp=&p1;
+            for (uint8_t k=0; k<2; k++){
+              for (uint8_t j=0; j<NB_BOMB_MAX; j++){
+                if (getIndice(pp->bombs[j].x,pp->bombs[j].y)==ind){
+                  range2=pp->range;
+                  break;
+                }
+              }
+              pp=&p2;
+            }
+            explode(temp[i+1],(0!=range2)?range2:range);//todo check who's bomb it is and adapt range
+          }
+          tiles[temp[i+1]].walls=((tiles[temp[i+1]].walls&0xF0)|TILE_EXPLODING);
+        }
+        else break;
+      }
+      else break;
+    }
+  }
+}
+
+bool checkBombs(void){
+  bool boom=false;
+  Player* pp=&p1;
+  for (uint8_t j=0;j<2;j++){
+    for (uint8_t i=0; i<NB_BOMB_MAX; i++){
+      if ((0!=pp->bombs[i].counter)&&(WEAPON_DETO!=pp->weapons)){
+        if (0==--pp->bombs[i].counter){
+          explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);
+          boom=true;
+        }
+      }
+    }
+    pp=&p2; 
+  }
+  if (boom){ //check if there's a chain reaction
+    for (uint8_t j=0;j<2;j++){
+      for (uint8_t i=0; i<NB_BOMB_MAX; i++){
+        if (0!=pp->bombs[i].counter){
+          if ((tiles[getIndice(pp->bombs[i].x,pp->bombs[i].y)].walls&TILE_EXPLODING)==TILE_EXPLODING){
+            explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);
+            pp->bombs[i].counter=0;
+            i=0; // because it might have triggered another...
+          }
+        }
+      }
+      pp=&p1;
+    }
+  }
+  return boom;
+}
 
 void controlRobot(void){ //check if arrow key is pressed, check if move is possible and then move
   uint8_t dir=99;
@@ -157,11 +220,20 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   if (arduboy.justPressed(B_BUTTON)){ //B action (Bomb for now)    
     if (arduboy.pressed(A_BUTTON)){
       //secondary weapon (or switch weapon)
+      if (WEAPON_DETO==pp->weapons){
+        for (uint8_t i=0; i<NB_BOMB_MAX; i++){
+          if (pp->bombs[i].counter>0){            
+            //explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);            
+            pp->bombs[i].counter=1;
+          }
+        }
+        checkBombs();
+      }
     }
     else {
       if (pp->placeBomb()){
-      hold=true;
-      timer=HOLD_THRESHOLD-1;
+        hold=true;
+        timer=HOLD_THRESHOLD-1;
       }
     }
   }
@@ -265,7 +337,7 @@ void checkMoving(void){
   }
 }
 
-void explode(uint8_t ind, uint8_t range){
+/*void explode(uint8_t ind, uint8_t range){
   tiles[ind].walls=(tiles[ind].walls&0xF0)|TILE_EXPLODING;
   int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1,-1,-1,-1,-1,-1};
   if (range>BOMB_RANGE_MAX)
@@ -296,37 +368,6 @@ void explode(uint8_t ind, uint8_t range){
       else break;
     }
   }
-}
-
-bool checkBombs(void){
-  bool boom=false;
-  Player* pp=&p1;
-  for (uint8_t j=0;j<2;j++){
-    for (uint8_t i=0; i<NB_BOMB_MAX; i++){
-      if (0!=pp->bombs[i].counter){
-        if (0==--pp->bombs[i].counter){
-          explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);
-          boom=true;
-        }
-      }
-    }
-    pp=&p2; 
-  }
-  if (boom){ //check if there's a chain reaction
-    for (uint8_t j=0;j<2;j++){
-      for (uint8_t i=0; i<NB_BOMB_MAX; i++){
-        if (0!=pp->bombs[i].counter){
-          if ((tiles[getIndice(pp->bombs[i].x,pp->bombs[i].y)].walls&TILE_EXPLODING)==TILE_EXPLODING){
-            explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);
-            pp->bombs[i].counter=0;
-            i=0; // because it might have triggered another...
-          }
-        }       
-      }
-      pp=&p1;
-    }
-  }
-  return boom;
-}
+}*/
 
 #endif
