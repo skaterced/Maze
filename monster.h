@@ -15,32 +15,59 @@ class Monster {
   public :
     uint8_t x, y;
     uint8_t dir;
+    uint8_t type;
     //uint8_t counter; // decreasing to 0 means exploding, then inactive
     Monster() { //uint8_t x, uint8_t y) {
       this->x = 0;
       this->y = 0;
       //this->range=1;  //-> robot
       this->dir = 0;
+      type=0;
     }
     void draw(void) {
-      if (DEAD != (dir & 0x0F)) {
-
-        Sprites::drawOverwrite(x + leftBorder, y + upBorder, monstre_bitmap, 0);
-
-        if (3 != (dir & 0x0F))
-          arduboy.drawPixel(x + 3 + leftBorder + ((timer & 0x10) >> 4), y + 4 + upBorder, 1);
-        arduboy.drawPixel(x + 2 + leftBorder + ((timer & 0x08) >> 3) * 3, y + 7 + upBorder, 1);
-      }
-      else {
-        if ((timer < (HOLD_THRESHOLD + 9))&&((dir&0x10)!=0x10)) {
-          Sprites::drawOverwrite(x + leftBorder, y + upBorder, monstre_bitmap, 1); //monster "sreaming"
+      if (0==type){
+        if (DEAD != (dir & 0x0F)) {
+          Sprites::drawOverwrite(x + leftBorder, y + upBorder, monstre_bitmap, 0);
+  
+          if (3 != (dir & 0x0F))
+            arduboy.drawPixel(x + 3 + leftBorder + ((timer & 0x10) >> 4), y + 4 + upBorder, 1);
+          arduboy.drawPixel(x + 2 + leftBorder + ((timer & 0x08) >> 3) * 3, y + 7 + upBorder, 1);
         }
         else {
-          Sprites::drawOverwrite(x + leftBorder, y + upBorder, robots_bitmap, 2 * BETWEEN_ROBOTS);
+          if ((timer < (HOLD_THRESHOLD + 9))&&((dir&0x10)!=0x10)) {
+            Sprites::drawOverwrite(x + leftBorder, y + upBorder, monstre_bitmap, 1); //monster "sreaming"
+          }
+          else {
+            Sprites::drawOverwrite(x + leftBorder, y + upBorder, robots_bitmap, 2 * BETWEEN_ROBOTS);
+          }
+          if (timer==HOLD_THRESHOLD+10){ //tile has finished exploding, now it contains a dead body
+            dir|=0x10;
+            tiles[getIndice(x,y)].walls|=TILE_TBD;
+          }
         }
-        if (timer==HOLD_THRESHOLD+10){ //tile has finished exploding, now it contains a dead body
-          dir|=0x10;
-          tiles[getIndice(x,y)].walls|=TILE_TBD;
+      }
+      else{
+        if (DEAD != (dir & 0x0F)) {
+          arduboy.drawPixel(x+2+leftBorder+(timer&0x04),y+7+upBorder,0);
+          arduboy.drawCircle(x+4+leftBorder,y+4+upBorder,3,0);      
+  
+          if (3 != (dir & 0x0F)) {
+            arduboy.drawPixel(x + 3 + leftBorder, y + 4 + upBorder, 0);
+            arduboy.drawPixel(x + 5 + leftBorder, y + 4 + upBorder, 0);
+          //arduboy.drawPixel(x + 2 + leftBorder + ((timer & 0x08) >> 3) * 3, y + 7 + upBorder, 0);
+          }
+        }
+        else {
+          if ((timer < (HOLD_THRESHOLD + 9))&&((dir&0x10)!=0x10)) {
+            Sprites::drawOverwrite(x + leftBorder, y + upBorder, monstre_bitmap, 1); //monster "sreaming"
+          }
+          else {
+            Sprites::drawOverwrite(x + leftBorder, y + upBorder, robots_bitmap, 2 * BETWEEN_ROBOTS);
+          }
+          if (timer==HOLD_THRESHOLD+10){ //tile has finished exploding, now it contains a dead body
+            dir|=0x10;
+            tiles[getIndice(x,y)].walls|=TILE_TBD;
+          }
         }
       }
     }

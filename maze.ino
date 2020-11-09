@@ -42,6 +42,7 @@ void mazeInit(void){
   //todo? random player starts
   movesLeft=movesInit/2;
   monstersInit();
+  monsters[0].type=1; //test
   p1.init(true);
   if (twoPlayersMode){
     p2.init(false);
