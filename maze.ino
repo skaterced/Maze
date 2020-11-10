@@ -128,6 +128,11 @@ void loop() { // -------------------------  Init loop --------------------------
               p2.score+=SCORE_MONSTER;
             }
           }
+          for (uint8_t i=0; i<NB_BONUS_MAX; i++){ //destroy bonuses
+          if (TILE_EXPLODING==(tiles[getIndice(bonus[i].x,bonus[i].y)].walls&TILE_EXPLODING)){//(ind==getIndice(bonus[i].x,bonus[i].y)){
+              bonus[i].type=BONUS_INACTIVE;
+            }
+          }
           if (TILE_EXPLODING==(tiles[getIndice(p1.x,p1.y)].walls&TILE_EXPLODING))
             p1.dir=DEAD;
           if (TILE_EXPLODING==(tiles[getIndice(p2.x,p2.y)].walls&TILE_EXPLODING))
@@ -202,7 +207,7 @@ void loop() { // -------------------------  Init loop --------------------------
         game=BETWEEN_GAMES;
       }
     }// end of "if Hold"
-    bonus1.draw();      
+    drawBonuses();      
     drawMonsters();
     p1.drawBombs();
     if (twoPlayersMode){
@@ -214,7 +219,7 @@ void loop() { // -------------------------  Init loop --------------------------
   
   else if (BETWEEN_GAMES==game){
     bool GO=drawScore();
-    if (timer>90){
+    if (timer>130){
       if (GO){
         game=MENU;    
       }

@@ -139,20 +139,34 @@ void checkCrush(uint8_t ind, uint8_t what){
     Player * pp =&p1;
     if (!p1Playing)
       pp=&p2;
-      //for(nb_bonus_max...
-      ind=getIndice(pp->x,pp->y);
-      if((pp->x==bonus1.x)&&(pp->y==bonus1.y)){
-        switch (bonus1.type){
+    ind=getIndice(pp->x,pp->y);
+    for (uint8_t i=0; i<NB_BONUS_MAX; i++){
+      if((pp->x==bonus[i].x)&&(pp->y==bonus[i].y)){
+        switch (bonus[i].type){
+          case BONUS_INACTIVE:            
+          break;
           case BONUS_BIGGER:
             pp->range++;
           break;
           case BONUS_DETO:
             pp->weapons=WEAPON_DETO;
           break;
+          case BONUS_SCORE:
+            pp->score+=25;
+          break;
+          case BONUS_SHUFFLER:
+            pp->weapons=WEAPON_SHUFFLER;
+          break;
+          case BONUS_TELEPORT:
+            pp->weapons=WEAPON_TELEPORT;
+          break;
+          default:
+            pp->x=1; //means Error, bonus not defined
+          break;
         }
-        bonus1.type=BONUS_INACTIVE; //break;
+        bonus[i].type=BONUS_INACTIVE; //break;
       }
-    //}
+    }
   }
   else {
     // crushing dead monsters body (by another monster or by an explosion)

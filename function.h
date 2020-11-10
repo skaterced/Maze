@@ -73,6 +73,7 @@ bool canGoTo(uint8_t ind, uint8_t direction, uint8_t what){ //what: 0:Robot, 1: 
   }
   return false;
 }
+/*
 
 void inGameMenu(bool test, int test1, int test2){
   //int x=p1Playing? (leftBorder-42):(leftBorder+80);
@@ -132,7 +133,7 @@ void inGameMenu(bool test, int test1, int test2){
       arduboy.print(F("+..."));
     }
   }
-}
+}*/
 /*
 void turnUpdate(void){ /////////////////////////////////////// score ///////////////////////  score ///////////////////////
   if (1==difficulty) { // for MEMO that have bigger cards in difficulty 1

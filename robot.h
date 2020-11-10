@@ -7,7 +7,7 @@
 #include "globals.h"
 #include "weapon.h"
 #include "function.h"
-
+#include "tiles.h"
 
 
 const unsigned char robots_bitmap[] PROGMEM = {
@@ -61,7 +61,7 @@ class Player {
     Player(uint8_t X, uint8_t Y) {
       this->x=X;
       this->y=Y;
-      this->weapons=1;  //
+      this->weapons=0;  //
       this->range=1;
       this->dir=0;      
       this->score=0;
@@ -114,7 +114,10 @@ class Player {
         if (0==bombs[i].counter){
           bombs[i].x=x;
           bombs[i].y=y;
-          bombs[i].counter=(twoPlayersMode? BOMB_DEFAULT_T : BOMB_DEFAULT_T-3);
+          bombs[i].counter=(twoPlayersMode? BOMB_DEFAULT_T : BOMB_DEFAULT_T-3);          
+          if (WEAPON_DETO==weapons){
+            bombs[i].counter=255;
+          }
           tiles[getIndice(x,y)].walls|=TILE_BOMB;
           return true;
         }
@@ -178,7 +181,10 @@ bool checkBombs(void){
   Player* pp=&p1;
   for (uint8_t j=0;j<2;j++){
     for (uint8_t i=0; i<NB_BOMB_MAX; i++){
-      if ((0!=pp->bombs[i].counter)&&(WEAPON_DETO!=pp->weapons)){
+      if ((pp->weapons!=WEAPON_DETO)&&(pp->bombs[i].counter>100)){
+        pp->bombs[i].counter=3;
+      }      
+      if (0!=pp->bombs[i].counter){
         if (0==--pp->bombs[i].counter){
           explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);
           boom=true;
@@ -189,7 +195,7 @@ bool checkBombs(void){
   }
   if (boom){ //check if there's a chain reaction
     for (uint8_t j=0;j<2;j++){
-      for (uint8_t i=0; i<NB_BOMB_MAX; i++){
+      for (uint8_t i=0; i<NB_BOMB_MAX; i++){        
         if (0!=pp->bombs[i].counter){
           if ((tiles[getIndice(pp->bombs[i].x,pp->bombs[i].y)].walls&TILE_EXPLODING)==TILE_EXPLODING){
             explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);
@@ -219,16 +225,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   //walls=tiles[temp].walls;
   if (arduboy.justPressed(B_BUTTON)){ //B action (Bomb for now)    
     if (arduboy.pressed(A_BUTTON)){
-      //secondary weapon (or switch weapon)
-      if (WEAPON_DETO==pp->weapons){
-        for (uint8_t i=0; i<NB_BOMB_MAX; i++){
-          if (pp->bombs[i].counter>0){            
-            //explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);            
-            pp->bombs[i].counter=1;
-          }
-        }
-        checkBombs();
-      }
+
     }
     else {
       if (pp->placeBomb()){
@@ -239,7 +236,45 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
   }
   else if (arduboy.justPressed(UP_BUTTON)){
     if (arduboy.pressed(A_BUTTON)){
-      //select weapon
+      //secondary weapon (or switch weapon)
+      if (WEAPON_DETO==pp->weapons){
+        for (uint8_t i=0; i<NB_BOMB_MAX; i++){
+          if (pp->bombs[i].counter>0){            
+            //explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);            
+            pp->bombs[i].counter=1;
+            hold=true;
+            timer=HOLD_THRESHOLD-1;
+          }
+        }
+      }
+      else if (WEAPON_SHUFFLER==pp->weapons){        
+        for (uint8_t i=0;i<NBTILES;i++){
+          if (((temp%casesCol)==i%casesCol)||((temp/casesCol)==i/casesCol)){
+            for (uint8_t j=0;j<4;j++){
+              if (random(100)<50){
+                tiles[i].turn(true);
+                imposeWall(i,true);
+              }
+            }
+          }
+        }
+        hold=true;
+        timer=HOLD_THRESHOLD-1;
+      }
+      else if (WEAPON_TELEPORT==pp->weapons){
+        uint8_t tempX = random(casesCol) * casesLength + 1;
+        uint8_t tempY = random(casesRow) * casesHeight + 1;
+        uint8_t tempI = getIndice(tempX, tempY);
+        while (((tiles[tempI].walls & TILE_TBD) == TILE_TBD) || ((tiles[tempI].walls & TILE_MONSTER) == TILE_MONSTER) || ((tempX==p1.x)&&(tempY==p1.y)) || ((tempX==p2.x)&&(tempY==p2.y)) ){
+          tempX = random(casesCol) * casesLength + 1;
+          tempY = random(casesRow) * casesHeight + 1;
+          tempI = getIndice(tempX, tempY);
+        }
+        pp->x = tempX;
+        pp->y = tempY;
+        hold=true;
+        timer=HOLD_THRESHOLD-1;
+      }  
     }
     else {
       dir=HAUT;      
