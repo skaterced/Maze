@@ -53,10 +53,12 @@ void drawSelector(int i){
 }
 */
 
-bool canGoTo(uint8_t ind, uint8_t direction, uint8_t what){ //what: 0:Robot, 1: monster, 2:explosion
+bool canGoTo(uint8_t ind, uint8_t direction, uint8_t what){ //what: 0:Robot, 1: monster, 2:explosion, 3:cursor (OR NUKE)
   //check if there is no wall (or border) from tiles[ind] to tiles[voisin(ind, direction)]
   int temp=voisin(ind, direction);
   if (-1!=temp){
+    if (CURSOR==what)
+    return true;
     if (0==(tiles[ind].walls&(0x10<<direction))){
       if (TILE_BOMB==(tiles[temp].walls&TILE_BOMB)){
         if (EXPLOSION==what)

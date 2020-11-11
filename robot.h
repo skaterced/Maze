@@ -9,20 +9,13 @@
 #include "function.h"
 #include "tiles.h"
 
+#define INVINCIBILITY 0x80
 
 const unsigned char robots_bitmap[] PROGMEM = {
 // width, height,
 8, 8,
 //0
 //R1_0-3
-/*
-0x00,0x00,0x7c,0x2a,0x29,0x62,0x7c,0x00,
-0x00,0x00,0x7c,0x2a,0x69,0x2a,0x7c,0x00,
-0x00,0x00,0x7c,0x62,0x29,0x2a,0x7c,0x00,
-0x00,0x00,0x7c,0x22,0x61,0x22,0x7c,0x00,
-*/
-// BoW
-//R_1_0-3
 0xff,0xff,0x83,0xd5,0xd6,0x9d,0x83,0xff,
 0xff,0xff,0x83,0xd5,0x96,0xd5,0x83,0xff,
 0xff,0xff,0x83,0x9d,0xd6,0xd5,0x83,0xff,
@@ -30,14 +23,6 @@ const unsigned char robots_bitmap[] PROGMEM = {
 //exploding
 0xff,0xd5,0xae,0xdb,0x9a,0xdf,0xae,0xd5,
 
-//0
-//R2_0-3
-/*
-0x00,0x00,0x7e,0x2a,0x62,0x22,0x7e,0x00,
-0x00,0x00,0x7e,0x62,0x2a,0x62,0x7e,0x00,
-0x00,0x00,0x7e,0x22,0x62,0x2a,0x7e,0x00,
-0x00,0x00,0x7e,0x62,0x22,0x62,0x7e,0x00,
-*/
 //R_2_0-3
 0xff,0xff,0x81,0xd5,0x9d,0xdd,0x81,0xff,
 0xff,0xff,0x81,0x9d,0xd5,0x9d,0x81,0xff,
@@ -54,14 +39,15 @@ class Player {
     uint8_t x,y; //could this be uint8_t ?
     uint8_t weapons; //0 means normal Bombs
     uint8_t range;
-    uint8_t dir; //if dir==DEAD, direction heaven
+    uint8_t dir; //if dir==DEAD : direction heaven 
     uint8_t lives=3;
     int score;
+    bool moving=false;
     Bomb bombs[NB_BOMB_MAX];
     Player(uint8_t X, uint8_t Y) {
       this->x=X;
       this->y=Y;
-      this->weapons=0;  //
+      this->weapons=0;
       this->range=1;
       this->dir=0;      
       this->score=0;
@@ -73,16 +59,18 @@ class Player {
         frame+=BETWEEN_ROBOTS;
       }
       if (DEAD!=dir){
-        Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots_bitmap, frame);          
+        if ((INVINCIBILITY!=(dir&INVINCIBILITY))||(0x02==(timer&0x02))){
+          Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots_bitmap, frame);          
+        }
       }
-      else {
+      else {        
         if (timer<(HOLD_THRESHOLD+9)){
           Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots_bitmap, (player1?  1:2)*BETWEEN_ROBOTS-1);
         }
         else {      
           Sprites::drawOverwrite(x+leftBorder, y+upBorder, robots_bitmap, 2*BETWEEN_ROBOTS);
         }
-      }
+      }      
     }
     void move(uint8_t direction, uint8_t distance){
       switch (direction){
@@ -126,11 +114,11 @@ class Player {
     }
     void init(bool player1){
       if (player1){
-        dir=2;
+        dir=0xD2;
         x=1;
       }
       else {
-        dir=0;
+        dir=0xD0;
         x=71;
       }      
       y=31;
@@ -150,7 +138,7 @@ void explode(uint8_t ind, uint8_t range){
     range=BOMB_RANGE_MAX;
   for (uint8_t j=0; j<4; j++){ //explode in all directions
     for (uint8_t i=0; i<range; i++){
-      if (canGoTo(temp[i],j,2)){
+      if (canGoTo(temp[i],j,EXPLOSION)){
         temp[i+1]=voisin(temp[i],j);
         if (-1!=temp[i+1]){
           if (TILE_BOMB==(tiles[temp[i+1]].walls&TILE_BOMB)){
@@ -192,6 +180,11 @@ bool checkBombs(void){
       }
     }
     pp=&p2; 
+  }
+  for (uint8_t i=0;i<NBTILES;i++){ //checking if there is an extern explosion. For ex. triggered by a bomb monster
+    if (TILE_EXPLODING==(tiles[i].walls&TILE_EXPLODING)){
+      boom=true;
+    }
   }
   if (boom){ //check if there's a chain reaction
     for (uint8_t j=0;j<2;j++){
@@ -239,8 +232,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       //secondary weapon (or switch weapon)
       if (WEAPON_DETO==pp->weapons){
         for (uint8_t i=0; i<NB_BOMB_MAX; i++){
-          if (pp->bombs[i].counter>0){            
-            //explode(getIndice(pp->bombs[i].x,pp->bombs[i].y),pp->range);            
+          if (pp->bombs[i].counter>0){  
             pp->bombs[i].counter=1;
             hold=true;
             timer=HOLD_THRESHOLD-1;
@@ -260,6 +252,11 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
         }
         hold=true;
         timer=HOLD_THRESHOLD-1;
+      }
+      else if (WEAPON_NUKE==pp->weapons){        
+        arduboy.pollButtons(); //to avoid firing north
+        hold=true;
+        timer=1; //spaecial case
       }
       else if (WEAPON_TELEPORT==pp->weapons){
         uint8_t tempX = random(casesCol) * casesLength + 1;
@@ -338,14 +335,18 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
     }
   }
   if (99!=dir){ //
-    pp->dir=dir;
+    //pp->dir=dir;
+    pp->dir&=0xF0;
+    pp->dir|=dir;
     if (false==stay){         
       if ((p1.x==p2.x)&&(p1.y==p2.y)){//||((tiles[getIndice(pp->x,pp->y)].walls&0x07)>0)){
         //return false;    
       }
       else { //valid move
         //movesLeft--; //inside checkMoving
-        pp->dir|=0x20; //adds a "moving timer"
+        //pp->dir|=0x20; //adds a "moving timer"
+        pp->moving=true;
+        pp->move(pp->dir&0x0F,5);
         hold=true;
         timer=HOLD_THRESHOLD-2;
         //return true;
@@ -356,6 +357,13 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       pp->move(dir, casesLength); //just because length=height      
     }
   }
+  if (hold&&(INVINCIBILITY==(pp->dir&INVINCIBILITY))){
+    uint8_t temp=(pp->dir&0x70)>>4;
+    pp->dir=pp->dir&0x0F;
+    if (--temp>0){
+      pp->dir|=((temp<<4)|INVINCIBILITY);
+    }
+  }
 }
 
 void checkMoving(void){
@@ -364,13 +372,13 @@ void checkMoving(void){
   if (p1Playing){
     pp=&p1;
   }
-  uint8_t temp=(pp->dir&0xF0)>>4;
-  if (temp-->0){
+  if (pp->moving){
     pp->move(pp->dir&0x0F,5);
-    pp->dir&=0x0F;
-    pp->dir|=(temp<<4);  
+    pp->moving=false;    
   }
 }
+
+
 
 /*void explode(uint8_t ind, uint8_t range){
   tiles[ind].walls=(tiles[ind].walls&0xF0)|TILE_EXPLODING;

@@ -10,7 +10,14 @@ const unsigned char PROGMEM bonus_bitmap[] = {
 0xff,0xff,0x85,0xb1,0x85,0xff,0xff,0xff,
 0xff,0xff,0xd3,0xd5,0xd5,0xe5,0xff,0xff, //score
 0xf7,0xe7,0xef,0x39,0x9c,0xf7,0xe7,0xef, //shuffler
-0xff,0x7d,0x7d,0x55,0x55,0x7d,0x7d,0xff //teleport
+0xff,0x7d,0x7d,0x55,0x55,0x7d,0x7d,0xff, //teleport
+0xff,0xab,0xc7,0xc7,0xc7,0xc7,0xef,0xff, //nuke (droite)
+//those are just to anim the nuking
+0xff,0xef,0xc7,0xc7,0xc7,0xc7,0xab,0xff, //gauche
+0xff,0xff,0xfd,0xc3,0x81,0xc3,0xfd,0xff, //bas
+0xff,0xab,0xc7,0xc7,0xc7,0xc7,0xef,0xff, //nuke (droite)
+0xff,0xff,0xbf,0xc3,0x81,0xc3,0xbf,0xff //haut
+
 };
 
 class Bomb {
@@ -42,13 +49,18 @@ class Bonus{
       y=y_;
       type=t;
     }
-    void draw(void){
-      switch(type){
-        case 0:
-        break;
-        default:
-          Sprites::drawOverwrite(x + leftBorder, y + upBorder, bonus_bitmap, type-1);
-        break;
+    void draw(bool draw){
+      if (draw){
+        switch(type){
+          case 0:
+          break;
+          default:
+            Sprites::drawOverwrite(x + leftBorder, y + upBorder, bonus_bitmap, type-1);
+          break;
+        }
+      }    
+      else {
+        arduboy.fillRect(x+leftBorder+1,y+upBorder+1,7,7,1);
       }
     }
 };
@@ -63,9 +75,10 @@ Bonus bonus[NB_BONUS_MAX];
 #define BONUS_SCORE 3
 #define BONUS_SHUFFLER 4
 #define BONUS_TELEPORT 5
+#define BONUS_NUKE 6
 */
 
-uint8_t bonusProb[NB_BONUS_TYPE]={10,10,20,10,10};
+uint8_t bonusProb[NB_BONUS_TYPE]={10,10,10,10,10,10};
 
 uint8_t getRandBonus(void){
   uint8_t diceRoll=0;
@@ -100,7 +113,7 @@ bool drop(uint8_t x_, uint8_t y_){
 
 void drawBonuses(void){
   for (uint8_t i=0; i<NB_BONUS_MAX; i++){
-    bonus[i].draw();
+    bonus[i].draw(true);
   }
 }
 #endif

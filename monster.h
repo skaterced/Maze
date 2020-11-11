@@ -4,6 +4,9 @@
 #include "globals.h"
 #include "robot.h"
 
+#define MONSTER_TYPE_CYCLOPE 0
+#define MONSTER_TYPE_BOMB 1
+
 const unsigned char PROGMEM monstre_bitmap[] = {
   // width, height,
   8, 8,
@@ -25,7 +28,7 @@ class Monster {
       type=0;
     }
     void draw(void) {
-      if (0==type){
+      if (MONSTER_TYPE_CYCLOPE==type){
         if (DEAD != (dir & 0x0F)) {
           Sprites::drawOverwrite(x + leftBorder, y + upBorder, monstre_bitmap, 0);
   
@@ -52,7 +55,7 @@ class Monster {
           }
         }
       }
-      else if (1==type){
+      else if (MONSTER_TYPE_BOMB==type){ //drop?
         if (DEAD != (dir & 0x0F)) {          
           arduboy.drawCircle(x+4+leftBorder,y+4+upBorder,3,0);
           arduboy.drawPixel(x+1+leftBorder,y+7+upBorder,(0x04==(timer&0x0C))?1:0);
@@ -103,6 +106,7 @@ class Monster {
       uint8_t tempX = random(casesCol) * casesLength + 1;
       uint8_t tempY = random(casesRow) * casesHeight + 1;
       uint8_t tempI = getIndice(tempX, tempY);
+      type=(random(100)<20)? MONSTER_TYPE_BOMB:MONSTER_TYPE_CYCLOPE;  
       while ((tempI == 24) || (tempI == 31) || ((tiles[tempI].walls & TILE_MONSTER) == TILE_MONSTER)) {
         tempX = random(casesCol) * casesLength + 1;
         tempY = random(casesRow) * casesHeight + 1;
@@ -125,8 +129,10 @@ bool checkMonsterCollision(void) { //between a robot and a monster
   for (uint8_t j = 0; j < 2; j++ ) {
     for (uint8_t i = 0; i < monstersPlaying; i++) {
       if ((pp->x == monsters[i].x) && (pp->y == monsters[i].y) && ((monsters[i].dir&DEAD) != DEAD)) {
-        pp->dir |= DEAD;
-        return true;
+        if (INVINCIBILITY!=(pp->dir&INVINCIBILITY)){
+          pp->dir |= DEAD;
+          return true;
+        }        
       }
     }
     pp = &p2;
@@ -159,6 +165,9 @@ void checkCrush(uint8_t ind, uint8_t what){
           break;
           case BONUS_TELEPORT:
             pp->weapons=WEAPON_TELEPORT;
+          break;
+          case BONUS_NUKE:
+            pp->weapons=WEAPON_NUKE;
           break;
           default:
             pp->x=1; //means Error, bonus not defined

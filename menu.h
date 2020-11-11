@@ -203,6 +203,30 @@ bool drawScore(){
 return GO;
 }
 
+uint8_t nukeMenu (void){
+  uint8_t x=(p1Playing? 0:87) ;
+  arduboy.fillRect(x,0,42,64,0);
+  arduboy.setCursor(x,8);
+  arduboy.print(F("Fire :")); //remaining?
+  arduboy.drawChar(x+10,25,27,1,0,1);
+  arduboy.drawChar(x+20,25,26,1,0,1);
+  arduboy.drawChar(x+15,30,25,1,0,1);
+  arduboy.drawChar(x+15,20,24,1,0,1);
+  
+  if (arduboy.justPressed(LEFT_BUTTON)){
+    return GAUCHE;
+  }
+  else if (arduboy.justPressed(RIGHT_BUTTON)){
+    return DROITE;
+  }
+  else if (arduboy.justPressed(UP_BUTTON)){
+    return HAUT;
+  }
+  else if (arduboy.justPressed(DOWN_BUTTON)){
+    return BAS;
+  }
+  return 99;
+}
 
 void inGameMenu(bool test, int test1, int test2){
   //int x=p1Playing? (leftBorder-42):(leftBorder+80);
@@ -238,11 +262,15 @@ void inGameMenu(bool test, int test1, int test2){
       }
       else if (pp->weapons==WEAPON_TELEPORT){
         arduboy.setCursor(x,12);
-        arduboy.print(F("teleport"));
+        arduboy.print(F("warp"));
       }
       else if (pp->weapons==WEAPON_SHUFFLER){
         arduboy.setCursor(x,12);
         arduboy.print(F("shuffle"));
+      }
+      else if (pp->weapons==WEAPON_NUKE){
+        arduboy.setCursor(x,12);
+        arduboy.print(F("nuke"));
       }
       else {
         arduboy.print(F("2nd"));

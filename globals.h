@@ -29,6 +29,7 @@ Arduboy2 arduboy;
 #define ROBOT 0
 #define MONSTER 1
 #define EXPLOSION 2
+#define CURSOR 3
 
 #define SYMETRIC true
 #define NBTILES 48//casesCol*casesRow
@@ -46,6 +47,7 @@ Arduboy2 arduboy;
 #define WEAPON_DETO 1
 #define WEAPON_SHUFFLER 4
 #define WEAPON_TELEPORT 5
+#define WEAPON_NUKE 6 //maybe add a counter
 
 #define BONUS_INACTIVE 0
 #define BONUS_BIGGER 1
@@ -53,7 +55,8 @@ Arduboy2 arduboy;
 #define BONUS_SCORE 3
 #define BONUS_SHUFFLER 4
 #define BONUS_TELEPORT 5
-#define NB_BONUS_TYPE 5 //to increment each time you add a bonus -> weapon.h
+#define BONUS_NUKE 6
+#define NB_BONUS_TYPE 6 //to increment each time you add a bonus -> weapon.h
 #define SCORE_MONSTER 10
 
 #define BOMB_RANGE_MAX 8
