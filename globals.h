@@ -18,6 +18,14 @@ Arduboy2 arduboy;
 #define DROITE 2
 #define BAS 1
 #define GAUCHE 0
+#define WWN 4 //"horse move" for the worm monster
+#define WWS 5
+#define SSW 6
+#define SSE 7
+#define EES 8
+#define EEN 9
+#define NNE 10
+#define NNW 11
 #define WALL_UP 0x80
 #define WALL_RIGHT 0x40
 #define WALL_DOWN 0x20
@@ -62,7 +70,7 @@ Arduboy2 arduboy;
 
 #define BOMB_RANGE_MAX 8
 #define NB_BOMB_MAX 3 //per player
-#define NB_MONSTER_MAX 10
+#define NB_MONSTER_MAX 15 //is also lvl max
 #define NB_BONUS_MAX 3
 #define BOMB_DEFAULT_T 9
 
@@ -87,15 +95,12 @@ uint8_t casesRow=6;
 int leftBorder=LEFTBORDERP1;
 int upBorder=2;
 
-//int adjSelectX=0; //no more other games... todo: clean
-//int adjSelectY=0;
-
 uint8_t cursX=2;
 uint8_t cursY=10;
 uint8_t movesInit=4;
 uint8_t movesLeft=movesInit/2;
 bool monstersMoved = false;
-uint8_t monstersPlaying=1;
+uint8_t monstersPlaying=1; //is also LVL
 bool versus=false;
 //uint8_t stoneArray [81];
 

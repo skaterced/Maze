@@ -52,7 +52,7 @@ class Player {
       this->dir=0;      
       this->score=0;
     }
-    void draw(bool player1){ //todo keep only BoW
+    void draw(bool player1){
       uint8_t frame=0; //WhiteOnBlack? 0:4;
       frame+=(dir&0x0F);
       if (!player1){
@@ -153,7 +153,7 @@ void explode(uint8_t ind, uint8_t range){
               }
               pp=&p2;
             }
-            explode(temp[i+1],(0!=range2)?range2:range);//todo check who's bomb it is and adapt range
+            explode(temp[i+1],(0!=range2)?range2:range);
           }
           tiles[temp[i+1]].walls=((tiles[temp[i+1]].walls&0xF0)|TILE_EXPLODING);
         }
@@ -382,39 +382,5 @@ void checkMoving(void){
   }
 }
 
-
-
-/*void explode(uint8_t ind, uint8_t range){
-  tiles[ind].walls=(tiles[ind].walls&0xF0)|TILE_EXPLODING;
-  int temp[BOMB_RANGE_MAX+1]={ind,-1,-1,-1,-1,-1,-1,-1,-1};
-  if (range>BOMB_RANGE_MAX)
-    range=BOMB_RANGE_MAX;
-  for (uint8_t j=0; j<4; j++){ //explode in all directions
-    for (uint8_t i=0; i<range; i++){
-      if (canGoTo(temp[i],j,2)){
-        temp[i+1]=voisin(temp[i],j);
-        if (-1!=temp[i+1]){
-          if (TILE_BOMB==(tiles[temp[i+1]].walls&TILE_BOMB)){
-            uint8_t range2=0;
-            Player* pp=&p1;
-            for (uint8_t k=0; k<2; k++){
-              for (uint8_t j=0; j<NB_BOMB_MAX; j++){
-                if (getIndice(pp->bombs[j].x,pp->bombs[j].y)==ind){
-                  range2=pp->range;
-                  break;
-                }
-              }
-              pp=&p2;
-            }
-            explode(temp[i+1],(0!=range2)?range2:range);//todo check who's bomb it is and adapt range
-          }
-          tiles[temp[i+1]].walls=((tiles[temp[i+1]].walls&0xF0)|TILE_EXPLODING);
-        }
-        else break;
-      }
-      else break;
-    }
-  }
-}*/
 
 #endif

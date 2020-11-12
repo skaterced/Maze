@@ -80,9 +80,12 @@ void drawTiles(void){
       }
     }
   }
-}
-
+}/*Sketch uses 18368 - 18504 bytes (64%) of program storage space. Maximum is 28672 bytes.
+Global variables use 1470 bytes (57%) of dynamic memory, leaving 1090 bytes for local variables. Maximum is 2560 bytes.
+*/
 int voisin(uint8_t ind, uint8_t direction){  //Yes, I switched back to french. I prefer the word "voisin" than "neighbor"
+  if (ind>200)
+    return -1;
   switch(direction){
     case (HAUT):
       if (ind<casesCol)
@@ -111,6 +114,30 @@ int voisin(uint8_t ind, uint8_t direction){  //Yes, I switched back to french. I
       else {
         return (ind-1);
       }
+    break;
+    case (WWN):
+      return voisin(voisin(voisin(ind, GAUCHE),GAUCHE),HAUT);
+    break;
+    case (WWS):
+      return voisin(voisin(voisin(ind, GAUCHE),GAUCHE),BAS);
+    break;
+    case (SSW):
+      return voisin(voisin(voisin(ind, BAS),BAS),GAUCHE);
+    break;
+    case (SSE):
+      return voisin(voisin(voisin(ind, BAS),BAS),DROITE);
+    break;
+    case (EES):
+      return voisin(voisin(voisin(ind, DROITE),DROITE),BAS);
+    break;
+    case (EEN):
+      return voisin(voisin(voisin(ind, DROITE),DROITE),HAUT);
+    break;
+    case (NNE):
+      return voisin(voisin(voisin(ind, HAUT),HAUT),DROITE);
+    break;
+    case (NNW):
+      return voisin(voisin(voisin(ind, HAUT),HAUT),GAUCHE);
     break;
   }
   return -1;

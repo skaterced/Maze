@@ -58,9 +58,16 @@ bool canGoTo(uint8_t ind, uint8_t direction, uint8_t what){ //what: 0:Robot, 1: 
   //check if there is no wall (or border) from tiles[ind] to tiles[voisin(ind, direction)]
   int temp=voisin(ind, direction);
   if (-1!=temp){
-    if (CURSOR==what)
-    return true;
-    if (0==(tiles[ind].walls&(0x10<<direction))){
+    if (CURSOR==what){
+      return true;
+    }
+    if(direction>3){ // (direction>3 only for worm and he doesn't care about the walls)
+      if ((tiles[temp].walls&(TILE_BOMB|TILE_MONSTER))!=0){
+        return false;
+      }
+      else return true;
+    }
+    else if (0==(tiles[ind].walls&(0x10<<direction))){
       if (TILE_BOMB==(tiles[temp].walls&TILE_BOMB)){
         if (EXPLOSION==what)
           return true;

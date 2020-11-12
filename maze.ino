@@ -15,9 +15,7 @@
         -if you go on a monster, he will even. move
 
       todo: 
-        -limit nuke ammo (with up-facing-nukes)
-        -warp no more random
-        -
+        - check score...
 */
 
 #include "menu.h"
@@ -76,7 +74,7 @@ void loop() { // -------------------------  Init loop --------------------------
   else if (MAZE == game) { // _____________________|     |___________| Maze |___________|    |______________________________|
     //arduboy.clear();
     //test
-    //p1.score=90;
+    //p1.score=voisin(getIndice(p1.x,p1.y),WWN);
     //p2.score=-10;
     //inGameMenu(true, p1.score, p2.score); //"test mode" if true
 
@@ -85,7 +83,14 @@ void loop() { // -------------------------  Init loop --------------------------
     arduboy.fillRect(leftBorder - 2, 0, 84, 64, 1);
 
     drawTiles();
-
+    drawBonuses();
+    drawMonsters();
+    p1.drawBombs();
+    if (twoPlayersMode) {
+      p2.drawBombs();
+      p2.draw(false);
+    }
+    p1.draw(true);
     //SelectorManagment();
     //drawSelector(getIndice(cursX,cursY));
 
@@ -108,7 +113,7 @@ void loop() { // -------------------------  Init loop --------------------------
     }
     else {
       checkMoving();
-      checkCrush(0, ROBOT);
+      checkCrush(0, ROBOT); //check for bonuses
       if (timer == HOLD_THRESHOLD) { //to prevent a player to play one move too much (and use one of his opponent's move)
         //hold=false;
         //ticks (robot has done one action)
@@ -151,12 +156,6 @@ void loop() { // -------------------------  Init loop --------------------------
         else {
           controlMonsters();
         }
-        /*else if (!controlMonsters()){ //check if false (all monsters dead) todo: make that elsewhere
-            if (monstersPlaying<NB_MONSTER_MAX){
-              monstersPlaying++;
-            }
-            mazeInit();
-          }*/
       }
       else if (timer == HOLD_THRESHOLD + 1) {
         controlMonsters();
@@ -277,6 +276,7 @@ void loop() { // -------------------------  Init loop --------------------------
         else timer--;
       }
     }// end of "if Hold"
+    /*
     drawBonuses();
     drawMonsters();
     p1.drawBombs();
@@ -284,7 +284,7 @@ void loop() { // -------------------------  Init loop --------------------------
       p2.drawBombs();
       p2.draw(false);
     }
-    p1.draw(true);
+    p1.draw(true);*/
   }
 
   else if (BETWEEN_GAMES == game) {
