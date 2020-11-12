@@ -259,6 +259,7 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
         timer=1; //spaecial case
       }
       else if (WEAPON_TELEPORT==pp->weapons){
+        /*
         uint8_t tempX = random(casesCol) * casesLength + 1;
         uint8_t tempY = random(casesRow) * casesHeight + 1;
         uint8_t tempI = getIndice(tempX, tempY);
@@ -270,7 +271,10 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
         pp->x = tempX;
         pp->y = tempY;
         hold=true;
-        timer=HOLD_THRESHOLD-1;
+        timer=HOLD_THRESHOLD-1;*/
+        timer=3; //another special case
+        hold=true;
+        cursX=cursY=41;
       }  
     }
     else {

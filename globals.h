@@ -31,6 +31,7 @@ Arduboy2 arduboy;
 #define EXPLOSION 2
 #define CURSOR 3
 
+#define BACK 210
 #define SYMETRIC true
 #define NBTILES 48//casesCol*casesRow
 #define LEFTBORDERP1 46

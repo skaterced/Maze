@@ -13,7 +13,6 @@
 
       known bug:
         -if you go on a monster, he will even. move
-        -nuke goes through robots
 
       todo: 
         -limit nuke ammo (with up-facing-nukes)
@@ -214,37 +213,44 @@ void loop() { // -------------------------  Init loop --------------------------
       else if (2 == timer) { //     nuke
         uint8_t dirTemp = 0;
         dirTemp = nukeMenu();
-        if (99 != dirTemp) {          
-          Player * pp= p1Playing? &p1:&p2;
+        if (dirTemp<10) {
+          
+          Player * pp= p1Playing? &p2:&p1;
+          uint8_t opponentI=getIndice(pp->x,pp->y);
+          pp= p1Playing? &p1:&p2;
           pp->dir=pp->dir&0xF0;
           pp->dir|=dirTemp;
-          Bonus bonTemp= Bonus(pp->x,pp->y,NB_BONUS_TYPE+1+dirTemp);
-          int tempI=getIndice(pp->x,pp->y);  //indice of the moving nuke
-          //uint8_t iT = tempI; //14; //iTest  
-          while(canGoTo(tempI,dirTemp,MONSTER)){
-            //iT=tempI;
+          Bonus shell= Bonus(pp->x,pp->y,NB_BONUS_TYPE+1+dirTemp);
+          int tempI=getIndice(pp->x,pp->y);  //indice of the moving nuke          
+          
+          while((canGoTo(tempI,dirTemp,MONSTER))&&(tempI!=opponentI)){
+          /*for (uint8_t i=0;i<10;i++){
+            if (!((tempI==opponentI)||(canGoTo(tempI,dirTemp,MONSTER)))){
+              break;
+            }*/
             tempI=voisin(tempI,dirTemp);
-            bonTemp.draw(false); //will erase the robot...
-            pp->draw(p1Playing);
+            shell.draw(false);
+            //if (0==i)
+              pp->draw(p1Playing);
             switch (dirTemp) {
               case HAUT:
-                bonTemp.y -= 10;
+                shell.y -= 10;
                 break;
               case BAS:
-                bonTemp.y += 10;
+                shell.y += 10;
                 break;
               case DROITE:
-                bonTemp.x += 10;
+                shell.x += 10;
                 break;
               case GAUCHE:
-                bonTemp.x -= 10;
+                shell.x -= 10;
                 break;
             }
-            bonTemp.draw(true);
+            shell.draw(true);
             arduboy.display();
             delay(40);
           }
-          if (canGoTo(tempI,dirTemp,EXPLOSION)){ // just another "step" if we can
+          if (canGoTo(tempI,dirTemp,EXPLOSION)&&(tempI!=opponentI)){ // just another "step" if we can
             tempI=voisin(tempI,dirTemp);
           }
           tiles[tempI].walls = TILE_EXPLODING; //destroy walls
@@ -254,6 +260,18 @@ void loop() { // -------------------------  Init loop --------------------------
             tiles[voisin(voisin(tempI, j), ((j+1) > 3) ? 0 : j+1)].walls |= TILE_EXPLODING;
           }
           timer=HOLD_THRESHOLD-1;
+        }
+        else if(BACK==dirTemp){
+          hold=false;
+        }
+        else timer--;
+      }
+      else if (4 == timer) { //     warp
+        uint8_t temp=warpMenu();
+        SelectorManagment();
+        drawSelector();
+        if (BACK==temp){
+          hold=false;
         }
         else timer--;
       }

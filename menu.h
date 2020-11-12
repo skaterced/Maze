@@ -109,11 +109,14 @@ void optionMenu(void){
   arduboy.drawChar(0,cursY,27,1,0,1);
   arduboy.drawChar(4,cursY,26,1,0,1);
   arduboy.setCursor(10,10);
-  arduboy.print(F("2P mode : "));
-  arduboy.print(versus? "VS":"Coop");
-  arduboy.setCursor(10,20);
   arduboy.print(F("Starting Lvl : "));
   arduboy.print(monstersPlaying);
+  arduboy.setCursor(10,20);
+  arduboy.print(F("2P mode : "));
+  arduboy.print(versus? "VS":"Coop");
+  arduboy.setCursor(10,30);
+  arduboy.print(F("2P turns: "));
+  arduboy.print(movesInit);
   // random bomb timer?
   
   //cheat
@@ -123,8 +126,8 @@ void optionMenu(void){
   //    arduboy.print(forEmulator ? "PC":"Arduboy");
   arduboy.setCursor(0,55);
   arduboy.print("WW.Github.com/skaterced");*/
-  arduboy.setCursor(1,55);
-  arduboy.print("A: Change    B: Back");
+  //arduboy.setCursor(1,55);
+  //arduboy.print("A: Change    B: Back");
   
   //arduboy.drawChar(0,cursY*10+10,16,1,0,1);
 
@@ -144,10 +147,10 @@ void optionMenu(void){
   if ((arduboy.justPressed(A_BUTTON))||(arduboy.justPressed(LEFT_BUTTON))||(arduboy.justPressed(RIGHT_BUTTON)))
   {
     switch (cursY){
-      case 10:
+      case 20:
         versus=!versus;
       break;
-      case 20:
+      case 10:
         if (arduboy.justPressed(LEFT_BUTTON)){
           if (--monstersPlaying==0)
           monstersPlaying=NB_MONSTER_MAX;  
@@ -155,6 +158,16 @@ void optionMenu(void){
         else {
           if (++monstersPlaying>NB_MONSTER_MAX)
             monstersPlaying=1;
+        }
+      break;
+      case 30:
+        if (arduboy.justPressed(LEFT_BUTTON)){
+          if (--movesInit==0)
+          movesInit=4;  
+        }
+        else {
+          if (++movesInit>4)
+            movesInit=1;
         }
       break;
     }
@@ -203,6 +216,35 @@ bool drawScore(){
 return GO;
 }
 
+uint8_t warpMenu(){
+  uint8_t x=(p1Playing? 0:87) ;
+  arduboy.fillRect(x,0,42,64,0);
+  arduboy.setCursor(x,8);
+  arduboy.print(F("Select"));
+  arduboy.setCursor(x+12,18);
+  arduboy.print(F("zone"));
+
+  arduboy.setCursor(x,56);
+  arduboy.print(F("B: back"));
+  
+  if (arduboy.justPressed(A_BUTTON)){
+    if (p1Playing){
+      p1.x=cursX;
+      p1.y=cursY;
+    }
+    else {
+      p2.x=cursX;
+      p2.y=cursY;    
+    }
+    timer=HOLD_THRESHOLD-1;    
+    return 1;
+  }
+  else if (arduboy.justPressed(B_BUTTON)){
+    return BACK;
+  }
+  return 0;
+}
+
 uint8_t nukeMenu (void){
   uint8_t x=(p1Playing? 0:87) ;
   arduboy.fillRect(x,0,42,64,0);
@@ -212,6 +254,8 @@ uint8_t nukeMenu (void){
   arduboy.drawChar(x+20,25,26,1,0,1);
   arduboy.drawChar(x+15,30,25,1,0,1);
   arduboy.drawChar(x+15,20,24,1,0,1);
+  arduboy.setCursor(x,56);
+  arduboy.print(F("B: back"));
   
   if (arduboy.justPressed(LEFT_BUTTON)){
     return GAUCHE;
@@ -224,6 +268,9 @@ uint8_t nukeMenu (void){
   }
   else if (arduboy.justPressed(DOWN_BUTTON)){
     return BAS;
+  }
+  else if (arduboy.justPressed(B_BUTTON)){
+    return BACK;
   }
   return 99;
 }
