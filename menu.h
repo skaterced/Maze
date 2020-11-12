@@ -246,7 +246,18 @@ uint8_t warpMenu(){
 }
 
 uint8_t nukeMenu (void){
-  uint8_t x=(p1Playing? 0:87) ;
+  uint8_t x;
+  uint8_t remaining;
+  if (p1Playing){
+    x=0;
+    remaining=p1.weapons>>4;
+  }
+  else {
+    x=87;
+    remaining=p2.weapons>>4;
+  }
+  
+  //Bonus ammo= Bonus(x+leftBorder,38,NB_BONUS_TYPE+5);
   arduboy.fillRect(x,0,42,64,0);
   arduboy.setCursor(x,8);
   arduboy.print(F("Fire :")); //remaining?
@@ -255,7 +266,13 @@ uint8_t nukeMenu (void){
   arduboy.drawChar(x+15,30,25,1,0,1);
   arduboy.drawChar(x+15,20,24,1,0,1);
   arduboy.setCursor(x,56);
-  arduboy.print(F("B: back"));
+  arduboy.print(F("B: back"));  
+  for (uint8_t i=0; i<remaining; i++){
+    //ammo.draw(true);
+    Sprites::drawOverwrite(x+5, 40, bonus_bitmap, NB_BONUS_TYPE+4);
+    //ammo.x+=10;
+    x+=10;
+  }
   
   if (arduboy.justPressed(LEFT_BUTTON)){
     return GAUCHE;
@@ -315,7 +332,7 @@ void inGameMenu(bool test, int test1, int test2){
         arduboy.setCursor(x,12);
         arduboy.print(F("shuffle"));
       }
-      else if (pp->weapons==WEAPON_NUKE){
+      else if ((pp->weapons&WEAPON_NUKE)!=0){
         arduboy.setCursor(x,12);
         arduboy.print(F("nuke"));
       }

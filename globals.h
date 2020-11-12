@@ -48,7 +48,7 @@ Arduboy2 arduboy;
 #define WEAPON_DETO 1
 #define WEAPON_SHUFFLER 4
 #define WEAPON_TELEPORT 5
-#define WEAPON_NUKE 6 //maybe add a counter
+#define WEAPON_NUKE 0x30 //included counter
 
 #define BONUS_INACTIVE 0
 #define BONUS_BIGGER 1

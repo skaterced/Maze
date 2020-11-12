@@ -50,7 +50,7 @@ void drawSelector(/*int i*/){
   arduboy.drawLine(x-4,y-4,x-2,y-2,0);  
   arduboy.drawLine(x-4,y+4,x-2,y+2,0);
   arduboy.drawLine(x+2,y+2,x+4,y+4,0);
-  arduboy.drawLine(x+2,y-2,x+4,y-4,1);
+  arduboy.drawLine(x+2,y-2,x+4,y-4,0);
 }
 
 

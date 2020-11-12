@@ -213,11 +213,12 @@ void loop() { // -------------------------  Init loop --------------------------
       else if (2 == timer) { //     nuke
         uint8_t dirTemp = 0;
         dirTemp = nukeMenu();
-        if (dirTemp<10) {
+        if (dirTemp<10) { //fire !!!
           
           Player * pp= p1Playing? &p2:&p1;
           uint8_t opponentI=getIndice(pp->x,pp->y);
           pp= p1Playing? &p1:&p2;
+          pp->weapons-=0x10;
           pp->dir=pp->dir&0xF0;
           pp->dir|=dirTemp;
           Bonus shell= Bonus(pp->x,pp->y,NB_BONUS_TYPE+1+dirTemp);

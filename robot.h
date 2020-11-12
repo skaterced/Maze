@@ -47,7 +47,7 @@ class Player {
     Player(uint8_t X, uint8_t Y) {
       this->x=X;
       this->y=Y;
-      this->weapons=0;
+      this->weapons=WEAPON_NUKE;
       this->range=1;
       this->dir=0;      
       this->score=0;
@@ -253,8 +253,8 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
         hold=true;
         timer=HOLD_THRESHOLD-1;
       }
-      else if (WEAPON_NUKE==pp->weapons){        
-        arduboy.pollButtons(); //to avoid firing north
+      else if ((pp->weapons&WEAPON_NUKE)!=0){        
+        //arduboy.pollButtons(); //to avoid firing north. Usefull?
         hold=true;
         timer=1; //spaecial case
       }
