@@ -188,17 +188,28 @@ class Monster {
     void reInit () {
       //type=MONSTER_TYPE_WORM;
       //type=(random(100)<20)? MONSTER_TYPE_BOMB:MONSTER_TYPE_CYCLOPE;  
-
+/*
       uint8_t randMon0=monstersPlaying*6;
       uint8_t randMon1=(monstersPlaying-1)*5;
       uint8_t randMon2=(monstersPlaying-1)*3;
-      
+  */
+      uint8_t randMon0 = 10;
+      uint8_t randMon1 = 0;
+      uint8_t randMon2 = 0;//(monstersPlaying/7)*10;
+
+      if (monstersPlaying>=3){
+        randMon1= (monstersPlaying-3)*2;
+      }
+      if (monstersPlaying>=6){
+        randMon1= (monstersPlaying-6)*3;
+      }
+
       uint8_t diceRoll=random(randMon0+randMon1+randMon2);
       if (diceRoll<=randMon0)
         type=0;
-      else if (diceRoll<=randMon0+randMon1)
+      else if (diceRoll<=(randMon0+randMon1))
         type=1;
-      else if (diceRoll<=randMon0+randMon1+randMon2)
+      else if (diceRoll<=(randMon0+randMon1+randMon2))
         type=2;
       
       uint8_t tempX = random(casesCol) * casesLength + 1;

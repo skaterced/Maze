@@ -68,7 +68,7 @@ bool mainMenu(void) {
     if (cursX<3)
       cursX++;
   }    
-  if (arduboy.justPressed(A_BUTTON))
+  if (arduboy.justPressed(A_BUTTON)) //                     ********************** NEW GAME **********************
   {
     if (hold){
       game=cursX;
@@ -76,7 +76,8 @@ bool mainMenu(void) {
         p1.lives=3;
         p2.lives=3;
         p1.score=p2.score=0;
-        p1.weapons=p2.weapons=0;
+        p1.weapons=p2.weapons=STARTING_WEAPON;
+        p1.range=p2.range=1;
         if (1==game){
           game=2;
           twoPlayersMode=false;          
@@ -181,6 +182,7 @@ bool drawScore(){
   bool GO=false;
   if ((0==p1.lives)||(0==p2.lives)){
     GO=true;
+    arduboy.setCursor(0,20);
     arduboy.print(F("Game Over")); 
   }
   else {
@@ -239,6 +241,8 @@ uint8_t warpMenu(){
 uint8_t nukeMenu (void){
   uint8_t x;
   uint8_t remaining;
+  bool fire=false;
+  
   if (p1Playing){
     x=0;
     remaining=p1.weapons>>4;
@@ -266,19 +270,28 @@ uint8_t nukeMenu (void){
   }
   
   if (arduboy.justPressed(LEFT_BUTTON)){
-    return GAUCHE;
+    remaining = GAUCHE;
+    fire=true;
   }
   else if (arduboy.justPressed(RIGHT_BUTTON)){
-    return DROITE;
+    remaining = DROITE;
+    fire=true;
   }
   else if (arduboy.justPressed(UP_BUTTON)){
-    return HAUT;
+    remaining = HAUT;
+    fire=true;
   }
   else if (arduboy.justPressed(DOWN_BUTTON)){
-    return BAS;
+    remaining = BAS;
+    fire=true;
   }
   else if (arduboy.justPressed(B_BUTTON)){
     return BACK;
+  }
+  if (fire){
+    //erase last mun.
+    arduboy.fillRect(x-5, 40, 10, 10, 0);
+    return remaining;
   }
   return 99;
 }

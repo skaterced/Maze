@@ -52,11 +52,12 @@ Arduboy2 arduboy;
 #define DEAD 0x0F
 
 #define BETWEEN_ROBOTS 5 //Frame difference between Robot1 & Robot2
-#define WEAPON_MINE 0
+#define WEAPON_BOMB 0
 #define WEAPON_DETO 1
 #define WEAPON_SHUFFLER 4
 #define WEAPON_TELEPORT 5
 #define WEAPON_NUKE 0x30 //included counter
+#define STARTING_WEAPON 0
 
 #define BONUS_INACTIVE 0
 #define BONUS_BIGGER 1

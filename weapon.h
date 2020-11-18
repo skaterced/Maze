@@ -80,6 +80,7 @@ Bonus bonus[NB_BONUS_MAX];
 */
 
 uint8_t bonusProb[NB_BONUS_TYPE]={10,10,10,10,10,10};
+//uint8_t bonusProb[NB_BONUS_TYPE]={0,0,0,0,0,10};
 
 uint8_t getRandBonus(void){
   uint8_t diceRoll=0;

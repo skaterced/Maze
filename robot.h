@@ -47,7 +47,7 @@ class Player {
     Player(uint8_t X, uint8_t Y) {
       this->x=X;
       this->y=Y;
-      this->weapons=WEAPON_NUKE;
+      this->weapons=0;
       this->range=1;
       this->dir=0;      
       this->score=0;
