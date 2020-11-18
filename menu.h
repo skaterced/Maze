@@ -55,17 +55,6 @@ bool mainMenu(void) {
       case 3:
         arduboy.print(F("  <-  Option"));  
         break;
-/*
-       case 1:
-        arduboy.print(F("       Credit -> Star"));
-        break;
-      case 2:
-        arduboy.print(F("edit <- Start -> Opti"));
-        break;
-      case 3:
-        arduboy.print(F("tart <- Option"));  
-        break;
- */
     }
   }
   
@@ -85,14 +74,16 @@ bool mainMenu(void) {
       game=cursX;
       if (game<3){
         p1.lives=3;
+        p2.lives=3;
         p1.score=p2.score=0;
+        p1.weapons=p2.weapons=0;
         if (1==game){
           game=2;
-          twoPlayersMode=false;
-          p2.lives=3;
+          twoPlayersMode=false;          
           p2.x=90;
-          p2.dir=0;
+          p2.dir=0;          
         }
+        
         randomSeed((int)timer*37); 
         return true;     
       }
@@ -108,15 +99,15 @@ void optionMenu(void){
   
   arduboy.drawChar(0,cursY,27,1,0,1);
   arduboy.drawChar(4,cursY,26,1,0,1);
-  arduboy.setCursor(10,10);
+  arduboy.setCursor(12,10);
   arduboy.print(F("Starting Lvl : "));
   arduboy.print(monstersPlaying);
-  arduboy.setCursor(10,20);
+  arduboy.setCursor(12,20);
   arduboy.print(F("2P mode : "));
   arduboy.print(versus? "VS":"Coop");
-  arduboy.setCursor(10,30);
+  /*arduboy.setCursor(12,30);
   arduboy.print(F("2P turns: "));
-  arduboy.print(movesInit);
+  arduboy.print(movesInit);*/
   // random bomb timer?
   
   //cheat
@@ -160,7 +151,7 @@ void optionMenu(void){
             monstersPlaying=1;
         }
       break;
-      case 30:
+      /*case 30:
         if (arduboy.justPressed(LEFT_BUTTON)){
           if (--movesInit==0)
           movesInit=4;  
@@ -169,7 +160,7 @@ void optionMenu(void){
           if (++movesInit>4)
             movesInit=1;
         }
-      break;
+      break;*/
     }
     
   }
@@ -260,7 +251,7 @@ uint8_t nukeMenu (void){
   //Bonus ammo= Bonus(x+leftBorder,38,NB_BONUS_TYPE+5);
   arduboy.fillRect(x,0,42,64,0);
   arduboy.setCursor(x,8);
-  arduboy.print(F("Fire :")); //remaining?
+  arduboy.print(F("Fire :"));
   arduboy.drawChar(x+10,25,27,1,0,1);
   arduboy.drawChar(x+20,25,26,1,0,1);
   arduboy.drawChar(x+15,30,25,1,0,1);
@@ -337,9 +328,10 @@ void inGameMenu(bool test, int test1, int test2){
         arduboy.print(F("nuke"));
       }
       else {
-        arduboy.print(F("2nd"));
+        //arduboy.print(F("2nd"));
         arduboy.setCursor(x,12);
-        arduboy.print(F("weapon"));
+        //arduboy.print(F("weapon"));
+        arduboy.print(F("empty"));
       }
       arduboy.drawChar(x,25,27,1,0,1);
       arduboy.drawChar(x+5,25,26,1,0,1);

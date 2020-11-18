@@ -122,6 +122,7 @@ class Player {
         x=71;
       }      
       y=31;
+      //weapons=0;
       for (uint8_t i=0; i<NB_BOMB_MAX; i++){
         bombs[i].counter=0;
       }

@@ -1,5 +1,5 @@
 #ifndef monster_h
-#define weapon_h
+#define monster_h
 
 #include "globals.h"
 #include "robot.h"

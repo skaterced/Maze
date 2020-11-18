@@ -49,6 +49,9 @@ void mazeInit(void) {
   else {
     p2.x = p2.y = 99;
   }
+  for (uint8_t i=0; i<NB_BONUS_MAX; i++){
+    bonus[i].type=BONUS_INACTIVE;
+  }
   hold = false;
 }
 void loop() { // -------------------------  Init loop -------------------------------------------------------------------------
@@ -125,16 +128,15 @@ void loop() { // -------------------------  Init loop --------------------------
             if (TILE_EXPLODING == (tiles[tempI].walls & TILE_EXPLODING)) {
               if ((monsters[i].dir & 0x0F) != DEAD) {
                 monsters[i].dir = DEAD;
+                p1.score += SCORE_MONSTER;
+                p2.score += SCORE_MONSTER;
                 if (monsters[i].type == MONSTER_TYPE_BOMB) {
                   explode(tempI, BOMB_RANGE_MAX);
                   timer -= 2; // that way there is another checkBombs and then it could lead to a chain reaction of bomb monster
                 }
               }
               else
-                checkCrush(tempI, EXPLOSION);
-
-              p1.score += SCORE_MONSTER;
-              p2.score += SCORE_MONSTER;
+                checkCrush(tempI, EXPLOSION);              
             }
           }
           for (uint8_t i = 0; i < NB_BONUS_MAX; i++) { //destroy bonuses
