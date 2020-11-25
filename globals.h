@@ -54,10 +54,11 @@ Arduboy2 arduboy;
 #define BETWEEN_ROBOTS 5 //Frame difference between Robot1 & Robot2
 #define WEAPON_BOMB 0
 #define WEAPON_DETO 1
-#define WEAPON_SHUFFLER 4
+#define WEAPON_SHUFFLER 4 //bof...
 #define WEAPON_TELEPORT 5
-#define WEAPON_NUKE 0x30 //included counter
-#define STARTING_WEAPON 0
+#define WEAPON_NUKE 0x30 //counter included 
+#define WEAPON_MINE 0xC0 //counter included 
+#define STARTING_WEAPON 0xC0
 
 #define BONUS_INACTIVE 0
 #define BONUS_BIGGER 1
@@ -66,13 +67,15 @@ Arduboy2 arduboy;
 #define BONUS_SHUFFLER 4
 #define BONUS_TELEPORT 5
 #define BONUS_NUKE 6
-#define NB_BONUS_TYPE 6 //to increment each time you add a bonus -> weapon.h
+#define BONUS_MINE 7
+#define NB_BONUS_TYPE 7 //to increment each time you add a bonus -> weapon.h
 #define SCORE_MONSTER 10
 
 #define BOMB_RANGE_MAX 8
 #define NB_BOMB_MAX 3 //per player
 #define NB_MONSTER_MAX 15 //is also lvl max
 #define NB_BONUS_MAX 3
+#define NB_MINE_MAX 3
 #define BOMB_DEFAULT_T 9
 
 /*

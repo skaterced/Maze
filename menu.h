@@ -26,7 +26,7 @@ bool mainMenu(void) {
     arduboy.setCursor(22,15);
     arduboy.print(F("C" "\x82" "dric Martin\n"));
     arduboy.setCursor(39,25);
-    arduboy.print(F("present"));    
+    arduboy.print(F("presents"));    
   }
   
   arduboy.drawChar(scroll+66,25,77,1,0,3);
@@ -182,7 +182,7 @@ bool drawScore(){
   bool GO=false;
   if ((0==p1.lives)||(0==p2.lives)){
     GO=true;
-    arduboy.setCursor(0,20);
+    arduboy.setCursor(20,0);
     arduboy.print(F("Game Over")); 
   }
   else {
@@ -339,6 +339,10 @@ void inGameMenu(bool test, int test1, int test2){
       else if ((pp->weapons&WEAPON_NUKE)!=0){
         arduboy.setCursor(x,12);
         arduboy.print(F("nuke"));
+      }
+      else if ((pp->weapons&WEAPON_MINE)!=0){
+        arduboy.setCursor(x,12);
+        arduboy.print(F("mine"));
       }
       else {
         //arduboy.print(F("2nd"));

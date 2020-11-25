@@ -182,7 +182,7 @@ bool checkBombs(void){
     }
     pp=&p2; 
   }
-  for (uint8_t i=0;i<NBTILES;i++){ //checking if there is an extern explosion. For ex. triggered by a bomb monster
+  for (uint8_t i=0;i<NBTILES;i++){ //checking if there is an extern explosion. For ex. triggered by a nuke
     if (TILE_EXPLODING==(tiles[i].walls&TILE_EXPLODING)){
       boom=true;
     }
@@ -204,17 +204,17 @@ bool checkBombs(void){
   return boom;
 }
 
-void controlRobot(void){ //check if arrow key is pressed, check if move is possible and then move
+void controlRobot(Player * pp){ //check if arrow key is pressed, check if move is possible and then move
   uint8_t dir=99;
   bool stay=true;
   //uint8_t walls=0;
   uint8_t temp;
   // uint8_t movesBack=movesLeft;
-  Player* pp=&p2;
+  /*Player* pp=&p2;
 
   if (p1Playing){
     pp=&p1;
-  }
+  }*/
   temp=getIndice(pp->x,pp->y);
   //walls=tiles[temp].walls;
   if (arduboy.justPressed(B_BUTTON)){ //B action (Bomb for now)    
@@ -240,6 +240,19 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
           }
         }
       }
+      else if ((WEAPON_MINE&pp->weapons)!=0){
+        for (uint8_t i=0; i<NB_MINE_MAX; i++){
+          if (!mines[i].active){
+            tiles[getIndice(pp->x,pp->y)].walls|=TILE_TBD;
+            mines[i].x=pp->x;
+            mines[i].y=pp->y;
+            mines[i].active=true;
+            hold=true;
+            timer=HOLD_THRESHOLD-1;
+            break;
+          }
+        }
+      }
       else if (WEAPON_SHUFFLER==pp->weapons){        
         for (uint8_t i=0;i<NBTILES;i++){
           if (((temp%casesCol)==i%casesCol)||((temp/casesCol)==i/casesCol)){
@@ -257,22 +270,10 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       else if ((pp->weapons&WEAPON_NUKE)!=0){        
         //arduboy.pollButtons(); //to avoid firing north. Usefull?
         hold=true;
-        timer=1; //spaecial case
+        timer=1; //special case
       }
       else if (WEAPON_TELEPORT==pp->weapons){
-        /*
-        uint8_t tempX = random(casesCol) * casesLength + 1;
-        uint8_t tempY = random(casesRow) * casesHeight + 1;
-        uint8_t tempI = getIndice(tempX, tempY);
-        while (((tiles[tempI].walls & TILE_TBD) == TILE_TBD) || ((tiles[tempI].walls & TILE_MONSTER) == TILE_MONSTER) || ((tempX==p1.x)&&(tempY==p1.y)) || ((tempX==p2.x)&&(tempY==p2.y)) ){
-          tempX = random(casesCol) * casesLength + 1;
-          tempY = random(casesRow) * casesHeight + 1;
-          tempI = getIndice(tempX, tempY);
-        }
-        pp->x = tempX;
-        pp->y = tempY;
-        hold=true;
-        timer=HOLD_THRESHOLD-1;*/
+
         timer=3; //another special case
         hold=true;
         cursX=cursY=41;
@@ -362,13 +363,13 @@ void controlRobot(void){ //check if arrow key is pressed, check if move is possi
       pp->move(dir, casesLength); //just because length=height      
     }
   }
-  if (hold&&(INVINCIBILITY==(pp->dir&INVINCIBILITY))){
+  /*if (hold&&(INVINCIBILITY==(pp->dir&INVINCIBILITY))){ -> in testEOT()
     uint8_t temp=(pp->dir&0x70)>>4;
     pp->dir=pp->dir&0x0F;
     if (--temp>0){
       pp->dir|=((temp<<4)|INVINCIBILITY);
     }
-  }
+  }*/
 }
 
 void checkMoving(void){
@@ -383,5 +384,21 @@ void checkMoving(void){
   }
 }
 
+bool testEOT(Player * pp){
+  if (INVINCIBILITY==(pp->dir&INVINCIBILITY)){
+      uint8_t temp=(pp->dir&0x70)>>4;
+      pp->dir=pp->dir&0x0F;
+      if (--temp>0){
+        pp->dir|=((temp<<4)|INVINCIBILITY);
+      }
+    }
+  if ((--movesLeft == 0) && (twoPlayersMode)) { //retest because of the bomb skip...
+    movesLeft = movesInit;
+    p1Playing = !p1Playing;    
+    return true;
+    //timer+=3;
+  }
+  return false;
+}
 
 #endif

@@ -277,6 +277,9 @@ void checkCrush(uint8_t ind, uint8_t what){
           case BONUS_NUKE:
             pp->weapons=WEAPON_NUKE;
           break;
+          case BONUS_MINE:
+            pp->weapons=WEAPON_MINE;
+          break;
           default:
             pp->x=1; //means Error, bonus not defined
           break;
@@ -291,8 +294,15 @@ void checkCrush(uint8_t ind, uint8_t what){
       if ((monsters[i].dir&DEAD) == DEAD) {
         if (getIndice(monsters[i].x,monsters[i].y)==ind){
           monsters[i].y=182; //six feet under...
-          return;
+          break;
         }
+      }
+    }
+    for (uint8_t i=0; i<NB_MINE_MAX; i++){
+      if (ind==getIndice(mines[i].x,mines[i].y)){
+        mines[i].active=false;
+        explode(ind,1);
+        timer = HOLD_THRESHOLD-2; //don't think it's a good idea...
       }
     }
   }
@@ -319,7 +329,7 @@ bool controlMonsters() { //return false if every monsters are dead
           Sprites::drawOverwrite(monsters[i].x + leftBorder, monsters[i].y + upBorder, monstre_bitmap, 3);
           arduboy.display();
           delay(80);
-        }        
+        }
         uint8_t tempI=getIndice(monsters[i].x,monsters[i].y);
         if (TILE_TBD==(tiles[tempI].walls&TILE_TBD)){
             checkCrush(tempI, MONSTER);

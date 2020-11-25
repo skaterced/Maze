@@ -85,8 +85,10 @@ void loop() { // -------------------------  Init loop --------------------------
 
     arduboy.fillRect(leftBorder - 2, 0, 84, 64, 1);
 
+    Player * pp= p1Playing? &p1:&p2;
+
     drawTiles();
-    drawBonuses();
+    drawBonuses(); //mines included
     drawMonsters();
     p1.drawBombs();
     if (twoPlayersMode) {
@@ -99,7 +101,7 @@ void loop() { // -------------------------  Init loop --------------------------
 
     if (!hold) {
       bool temp = true;
-      controlRobot(); // check buttons and play robot's action
+      controlRobot(pp); // check buttons and play robot's action
       for (uint8_t i = 0; i < monstersPlaying; i++) {
         if ((monsters[i].dir & DEAD) != DEAD) {
           temp = false;
@@ -109,13 +111,13 @@ void loop() { // -------------------------  Init loop --------------------------
       if (temp) {
         timer = 0;
         if (monstersPlaying < NB_MONSTER_MAX) {
-          monstersPlaying++;
+          monstersPlaying++; //next level
         }
         game = BETWEEN_GAMES;
       }
     }
     else {
-      checkMoving();
+      checkMoving(); //finish the robot movement if needed
       checkCrush(0, ROBOT); //check for bonuses
       if (timer == HOLD_THRESHOLD) { //to prevent a player to play one move too much (and use one of his opponent's move)
         //hold=false;
@@ -138,7 +140,15 @@ void loop() { // -------------------------  Init loop --------------------------
               else
                 checkCrush(tempI, EXPLOSION);              
             }
-          }
+          }/*
+          for (uint8_t i=0; i<NB_MINE_MAX; i++){
+            uint8_t tempI=getIndice(mines[i].x,mines[i].y);
+            if (TILE_EXPLODING==tiles[tempI].walls&TILE_EXPLODING){
+              mines[i].active=false;
+              explode(tempI,1);
+              timer -=2; //don't think it's a good idea...
+            }
+          }*/
           for (uint8_t i = 0; i < NB_BONUS_MAX; i++) { //destroy bonuses
             if (TILE_EXPLODING == (tiles[getIndice(bonus[i].x, bonus[i].y)].walls & TILE_EXPLODING)) { //(ind==getIndice(bonus[i].x,bonus[i].y)){
               bonus[i].type = BONUS_INACTIVE;
@@ -148,29 +158,32 @@ void loop() { // -------------------------  Init loop --------------------------
             p1.dir = DEAD;
           if ((TILE_EXPLODING == (tiles[getIndice(p2.x, p2.y)].walls & TILE_EXPLODING)) && (INVINCIBILITY != (p2.dir & INVINCIBILITY)))
             p2.dir = DEAD;
-          timer++; //skip a monster's turn
+          /*timer++; //skip a monster's turn
           if ((--movesLeft == 0) && (twoPlayersMode)) { //retest because of the bomb skip...
             movesLeft = movesInit;
             p1Playing = !p1Playing;
             //timer+=3;
-          }
+          }*/
+          testEOT(pp);
         }
         else {
+          timer+=8;
           controlMonsters();
         }
       }
-      else if (timer == HOLD_THRESHOLD + 1) {
+      else if (timer == HOLD_THRESHOLD + 9) {
         controlMonsters();
         if (!checkMonsterCollision()) {
-          if ((--movesLeft == 0) && (twoPlayersMode)) { //if changing turn, wait another few seconds
+          if (!testEOT(pp))
+          /*if ((--movesLeft == 0) && (twoPlayersMode)) { //if changing turn, wait another few seconds
             movesLeft = movesInit;
             p1Playing = !p1Playing;
             timer += 3;
-          }
-          else {
-            timer += 8;
+          }*/
+          //else {
+            //timer += 8;
             //hold=false;
-          }
+          //}
         }
       }
       else if (timer == HOLD_THRESHOLD + 10) { //bomb has finished exploding
@@ -211,12 +224,11 @@ void loop() { // -------------------------  Init loop --------------------------
         timer = 0;
         game = BETWEEN_GAMES;
       }
-      else if (2 == timer) { //     nuke
+      else if (2 == timer) { //    ---------------------------- nuke ---------------->
         uint8_t dirTemp = 0;
         dirTemp = nukeMenu();
-        if (dirTemp<10) { //fire !!!
-          
-          Player * pp= p1Playing? &p2:&p1;
+        if (dirTemp<10) { //fire !!!    
+          pp= p1Playing? &p2:&p1;               
           uint8_t opponentI=getIndice(pp->x,pp->y);
           pp= p1Playing? &p1:&p2;
           pp->weapons-=0x10;

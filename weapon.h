@@ -12,6 +12,7 @@ const unsigned char PROGMEM bonus_bitmap[] = {
 0xf7,0xe7,0xef,0x39,0x9c,0xf7,0xe7,0xef, //shuffler
 0xff,0x7d,0x7d,0x55,0x55,0x7d,0x7d,0xff, //teleport
 0xff,0xab,0xc7,0xc7,0xc7,0xc7,0xef,0xff, //nuke (droite)
+0xff,0xff,0xd7,0x83,0xc7,0x83,0xd7,0xff, //mine
 //those are just to anim the nuking
 0xff,0xef,0xc7,0xc7,0xc7,0xc7,0xab,0xff, //gauche
 0xff,0xff,0xfd,0xc3,0x81,0xc3,0xfd,0xff, //bas
@@ -19,6 +20,23 @@ const unsigned char PROGMEM bonus_bitmap[] = {
 0xff,0xff,0xbf,0xc3,0x81,0xc3,0xbf,0xff, //haut
 0x00,0x00,0x40,0x3c,0x7e,0x3c,0x40,0x00  //haut blanc sur noir
 
+};
+
+class Mine {
+  public:
+    uint8_t x,y;
+    bool active;
+    Mine(){
+      x=99;
+      y=99;
+      active=false;
+    }
+    void draw(void){
+      if (active){
+        arduboy.drawPixel(x+3+leftBorder,y+3+upBorder,(timer&0x02)>>1);
+        arduboy.drawCircle(x+4+leftBorder,y+4+upBorder,2,0); 
+      }
+    }
 };
 
 class Bomb {
@@ -70,6 +88,8 @@ class Bonus{
 #define DROP_RAND 40
 
 Bonus bonus[NB_BONUS_MAX];
+Mine mines[NB_MINE_MAX];
+
 /* copy of globals.h
 #define BONUS_BIGGER 1
 #define BONUS_DETO 2
@@ -79,7 +99,7 @@ Bonus bonus[NB_BONUS_MAX];
 #define BONUS_NUKE 6
 */
 
-uint8_t bonusProb[NB_BONUS_TYPE]={10,10,10,10,10,10};
+uint8_t bonusProb[NB_BONUS_TYPE]={10,10,10,10,10,10,150};
 //uint8_t bonusProb[NB_BONUS_TYPE]={0,0,0,0,0,10};
 
 uint8_t getRandBonus(void){
@@ -116,6 +136,9 @@ bool drop(uint8_t x_, uint8_t y_){
 void drawBonuses(void){
   for (uint8_t i=0; i<NB_BONUS_MAX; i++){
     bonus[i].draw(true);
+  }
+  for (uint8_t i=0; i<NB_MINE_MAX; i++){
+    mines[i].draw();
   }
 }
 #endif
