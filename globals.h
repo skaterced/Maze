@@ -58,7 +58,7 @@ Arduboy2 arduboy;
 #define WEAPON_TELEPORT 5
 #define WEAPON_NUKE 0x30 //counter included 
 #define WEAPON_MINE 0xC0 //counter included 
-#define STARTING_WEAPON 0x30
+#define STARTING_WEAPON 0
 
 #define BONUS_INACTIVE 0
 #define BONUS_BIGGER 1
@@ -68,7 +68,8 @@ Arduboy2 arduboy;
 #define BONUS_TELEPORT 5
 #define BONUS_NUKE 6
 #define BONUS_MINE 7
-#define NB_BONUS_TYPE 7 //to increment each time you add a bonus -> weapon.h
+#define BONUS_1UP 8
+#define NB_BONUS_TYPE 8 //to increment each time you add a bonus -> weapon.h
 #define SCORE_MONSTER 10
 
 #define BOMB_RANGE_MAX 8

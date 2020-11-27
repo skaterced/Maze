@@ -71,10 +71,15 @@ void drawTiles(void){
       arduboy.drawLine(x-1,y,x-1,y+casesHeight-1,0);
     }
     if (TILE_EXPLODING==(tiles[i].walls&TILE_EXPLODING)){
-      if (timer<(HOLD_THRESHOLD+5))
-        arduboy.drawChar(x+2,y+1,'O',0,1,1);
-      else if (timer<(HOLD_THRESHOLD+10))
-        arduboy.drawChar(x+2,y+1,'@',0,1,1);
+      if (timer<(HOLD_THRESHOLD+5)){
+        //arduboy.drawChar(x+2,y+1,'O',0,1,1); 
+        arduboy.fillCircle(x+5,y+4,timer-HOLD_THRESHOLD+1,0);
+      }        
+      else if (timer<(HOLD_THRESHOLD+10)){
+        //arduboy.drawChar(x+2,y+1,'@',0,1,1);
+        arduboy.fillCircle(x+5,y+4,5,0);
+        arduboy.fillCircle(x+5,y+4,timer-HOLD_THRESHOLD-3,1);
+      }
       else {
         tiles[i].walls&=0xF0; //clears the tile content
       }

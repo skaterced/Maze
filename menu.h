@@ -361,9 +361,14 @@ void inGameMenu(bool test, int test1, int test2){
 
       arduboy.drawChar(x,47,25,1,0,1);    
       arduboy.setCursor(x+5,47);
-      arduboy.print(F(": End"));
-      arduboy.setCursor(x+15,56);
-      arduboy.print(F("Turn"));
+      if (twoPlayersMode){
+        arduboy.print(F(": End"));
+        arduboy.setCursor(x+15,56);
+        arduboy.print(F("Turn"));
+      }
+      else{
+        arduboy.print(F(": Wait"));        
+      }
     }
     else {
       arduboy.setCursor(x,1);

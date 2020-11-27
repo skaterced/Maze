@@ -280,6 +280,11 @@ void checkCrush(uint8_t ind, uint8_t what){
           case BONUS_MINE:
             pp->weapons=WEAPON_MINE;
           break;
+          case BONUS_1UP:
+            if (!versus)
+              pp=&p1;
+            pp->lives++;
+          break;
           default:
             pp->x=1; //means Error, bonus not defined
           break;
