@@ -58,7 +58,7 @@ Arduboy2 arduboy;
 #define WEAPON_TELEPORT 5
 #define WEAPON_NUKE 0x30 //counter included 
 #define WEAPON_MINE 0xC0 //counter included 
-#define STARTING_WEAPON 0xC0
+#define STARTING_WEAPON 0x30
 
 #define BONUS_INACTIVE 0
 #define BONUS_BIGGER 1

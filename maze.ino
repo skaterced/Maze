@@ -51,6 +51,7 @@ void mazeInit(void) {
   }
   for (uint8_t i=0; i<NB_BONUS_MAX; i++){
     bonus[i].type=BONUS_INACTIVE;
+    mines[i].active=false; //nbecause they have the same limit
   }
   hold = false;
 }
@@ -75,12 +76,32 @@ void loop() { // -------------------------  Init loop --------------------------
   }
 
   else if (MAZE == game) { // _____________________|     |___________| Maze |___________|    |______________________________|
-    //arduboy.clear();
-    //test
-    //p1.score=voisin(getIndice(p1.x,p1.y),WWN);
-    //p2.score=-10;
-    //inGameMenu(true, p1.score, p2.score); //"test mode" if true
 
+/* Timer is a bit of a mess... it triggers a lot of things so I will try to explain it.
+ *  When Hold is true (the player just did something):
+ *  
+ *                                 __HOLD_THRESHOLD
+ *                                |
+ *  0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30
+ *        |     |           |  |  |                                    |   |                                       L__ end of turn
+ *        |     |           |  |  |                                     \ /
+ *        |     |           |  |  |                                      L____ moving monsters. if collision set Timer back to here: | otherwise, skip to EoT
+ *        |     |           |  |  |    ______________________________________________________________________________________________|    
+ *        |     |           |  |  |   |
+ *        |     |           |  |  |   V
+ *        |     |           |  |  |   x   x    x   x   x   x   x   x   _   _   _   _   _   _   _      (dead robot drawing)
+ *        |     |           |  |  |
+ *        |     |           |  |  |   O   O    O   O   @   @   @   @   @                              (exploding drawing)
+ *        |     |           |  |  |                                ^
+ *        |     |           |  |  L__ Check Bombs. if no: skip ____|
+ *        |     |            \/
+ *        |     |             L__ normal timer init
+ *        |     |
+ *        |     L__ Warp menu (Special case)
+ *        L__ Nuke menu (Special case)
+ * 
+ * 
+ */
     inGameMenu(false, 0, 0); //"test mode" if true
 
     arduboy.fillRect(leftBorder - 2, 0, 84, 64, 1);
@@ -134,21 +155,22 @@ void loop() { // -------------------------  Init loop --------------------------
                 p2.score += SCORE_MONSTER;
                 if (monsters[i].type == MONSTER_TYPE_BOMB) {
                   explode(tempI, BOMB_RANGE_MAX);
-                  timer -= 2; // that way there is another checkBombs and then it could lead to a chain reaction of bomb monster
+                  timer = HOLD_THRESHOLD-2; // that way there is another checkBombs and then it could lead to a chain reaction of bomb monster
                 }
               }
               else
                 checkCrush(tempI, EXPLOSION);              
             }
-          }/*
+          }
           for (uint8_t i=0; i<NB_MINE_MAX; i++){
             uint8_t tempI=getIndice(mines[i].x,mines[i].y);
-            if (TILE_EXPLODING==tiles[tempI].walls&TILE_EXPLODING){
+            if (mines[i].active&&(TILE_EXPLODING==(tiles[tempI].walls&TILE_EXPLODING))){
               mines[i].active=false;
               explode(tempI,1);
-              timer -=2; //don't think it's a good idea...
+              timer = HOLD_THRESHOLD-2; 
+              break;
             }
-          }*/
+          }
           for (uint8_t i = 0; i < NB_BONUS_MAX; i++) { //destroy bonuses
             if (TILE_EXPLODING == (tiles[getIndice(bonus[i].x, bonus[i].y)].walls & TILE_EXPLODING)) { //(ind==getIndice(bonus[i].x,bonus[i].y)){
               bonus[i].type = BONUS_INACTIVE;
@@ -158,35 +180,31 @@ void loop() { // -------------------------  Init loop --------------------------
             p1.dir = DEAD;
           if ((TILE_EXPLODING == (tiles[getIndice(p2.x, p2.y)].walls & TILE_EXPLODING)) && (INVINCIBILITY != (p2.dir & INVINCIBILITY)))
             p2.dir = DEAD;
-          /*timer++; //skip a monster's turn
-          if ((--movesLeft == 0) && (twoPlayersMode)) { //retest because of the bomb skip...
-            movesLeft = movesInit;
-            p1Playing = !p1Playing;
-            //timer+=3;
-          }*/
-          testEOT(pp);
         }
         else {
-          timer+=8;
-          controlMonsters();
+          if (!((DEAD == p1.dir) || ((DEAD == p2.dir) && (twoPlayersMode))))
+          timer+=8;         
         }
       }
       else if (timer == HOLD_THRESHOLD + 9) {
-        controlMonsters();
-        if (!checkMonsterCollision()) {
-          if (!testEOT(pp))
-          /*if ((--movesLeft == 0) && (twoPlayersMode)) { //if changing turn, wait another few seconds
-            movesLeft = movesInit;
-            p1Playing = !p1Playing;
-            timer += 3;
-          }*/
-          //else {
-            //timer += 8;
-            //hold=false;
-          //}
+        if (!((DEAD == p1.dir) || ((DEAD == p2.dir) && (twoPlayersMode))))
+          controlMonsters();
+      }
+      else if (timer == HOLD_THRESHOLD + 10) {
+        if (!((DEAD == p1.dir) || ((DEAD == p2.dir) && (twoPlayersMode)))){
+          controlMonsters();
+          if (!checkMonsterCollision()) {  //no monster have stepped on a mine (otherwise timer changed)
+            if (timer == HOLD_THRESHOLD + 10){
+              if (!testEOT(pp))
+                timer+=9;
+            }
+          }
+          else{
+            timer=HOLD_THRESHOLD+1; //that way there would be a robot dying animation
+          }
         }
       }
-      else if (timer == HOLD_THRESHOLD + 10) { //bomb has finished exploding
+      else if (timer == HOLD_THRESHOLD + 20) { //bomb has finished exploding
         /*if ((DEAD!=p1.dir)&&(DEAD!=p2.dir)){ //check if someone died
           hold=false;
           }*/
@@ -238,10 +256,6 @@ void loop() { // -------------------------  Init loop --------------------------
           int tempI=getIndice(pp->x,pp->y);  //indice of the moving nuke          
           
           while((canGoTo(tempI,dirTemp,MONSTER))&&(tempI!=opponentI)){
-          /*for (uint8_t i=0;i<10;i++){
-            if (!((tempI==opponentI)||(canGoTo(tempI,dirTemp,MONSTER)))){
-              break;
-            }*/
             tempI=voisin(tempI,dirTemp);
             shell.draw(false);
             //if (0==i)
@@ -290,15 +304,6 @@ void loop() { // -------------------------  Init loop --------------------------
         else timer--;
       }
     }// end of "if Hold"
-    /*
-    drawBonuses();
-    drawMonsters();
-    p1.drawBombs();
-    if (twoPlayersMode) {
-      p2.drawBombs();
-      p2.draw(false);
-    }
-    p1.draw(true);*/
   }
 
   else if (BETWEEN_GAMES == game) {

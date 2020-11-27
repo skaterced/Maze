@@ -201,7 +201,7 @@ class Monster {
         randMon1= (monstersPlaying-3)*2;
       }
       if (monstersPlaying>=6){
-        randMon1= (monstersPlaying-6)*3;
+        randMon2= (monstersPlaying-6)*3;
       }
 
       uint8_t diceRoll=random(randMon0+randMon1+randMon2);
@@ -329,6 +329,7 @@ bool controlMonsters() { //return false if every monsters are dead
           Sprites::drawOverwrite(monsters[i].x + leftBorder, monsters[i].y + upBorder, monstre_bitmap, 3);
           arduboy.display();
           delay(80);
+          temp = (temp >> 1);
         }
         uint8_t tempI=getIndice(monsters[i].x,monsters[i].y);
         if (TILE_TBD==(tiles[tempI].walls&TILE_TBD)){
@@ -338,7 +339,8 @@ bool controlMonsters() { //return false if every monsters are dead
         //|temp; //0x20;
       }
       else if (0x80 == temp) {
-        temp = 0; //monster now ready to move again
+        if (timer==HOLD_THRESHOLD + 10)
+          temp = 0; //monster now ready to move again
         //return true;
       }
       else {

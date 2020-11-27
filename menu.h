@@ -340,9 +340,11 @@ void inGameMenu(bool test, int test1, int test2){
         arduboy.setCursor(x,12);
         arduboy.print(F("nuke"));
       }
-      else if ((pp->weapons&WEAPON_MINE)!=0){
-        arduboy.setCursor(x,12);
+      else if ((pp->weapons&WEAPON_MINE)!=0){        
         arduboy.print(F("mine"));
+        arduboy.setCursor(x,12);
+        arduboy.print(F("left: "));
+        arduboy.print((pp->weapons&WEAPON_MINE)>>6);
       }
       else {
         //arduboy.print(F("2nd"));

@@ -182,7 +182,7 @@ bool checkBombs(void){
     }
     pp=&p2; 
   }
-  for (uint8_t i=0;i<NBTILES;i++){ //checking if there is an extern explosion. For ex. triggered by a nuke
+  for (uint8_t i=0;i<NBTILES;i++){ //checking if there is an external explosion. For ex. triggered by a nuke
     if (TILE_EXPLODING==(tiles[i].walls&TILE_EXPLODING)){
       boom=true;
     }
@@ -243,6 +243,10 @@ void controlRobot(Player * pp){ //check if arrow key is pressed, check if move i
       else if ((WEAPON_MINE&pp->weapons)!=0){
         for (uint8_t i=0; i<NB_MINE_MAX; i++){
           if (!mines[i].active){
+            uint8_t temp=(pp->weapons&WEAPON_MINE)>>6;
+            temp--;
+            pp->weapons&=~WEAPON_MINE;
+            pp->weapons|=(temp<<6);
             tiles[getIndice(pp->x,pp->y)].walls|=TILE_TBD;
             mines[i].x=pp->x;
             mines[i].y=pp->y;
